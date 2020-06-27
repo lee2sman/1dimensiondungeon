@@ -27,5 +27,7 @@ Suffice it to say: LOTS OF BUGS!
 - better core mechanic
 
 
-## Copyleft: This is a free work. You can copy, distribute, and modify it under the terms of the [Free Art License](http://artlibre.org/licence/lal/en/).
+### License
+
+Copyleft: This is a free work. You can copy, distribute, and modify it under the terms of the [Free Art License](http://artlibre.org/licence/lal/en/).
 
