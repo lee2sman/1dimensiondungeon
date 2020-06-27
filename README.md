@@ -18,6 +18,11 @@ Can also be modified to work in vertical orientation instead of horizontally, no
 
 Suffice it to say: LOTS OF BUGS!
 
+## To launch
+
+```
+node game.js
+```
 
 #### Things to add:
 - stairs
