@@ -21,7 +21,7 @@ function start(){
   console.log('Welcome to One Dim Dungeon 1dimensional roguelike');
   console.log();
   console.log('Last score:');
-  const lastHighScore = fs.readFileSync('highscore.txt', 'utf8');
+  const lastHighScore = fs.readFileSync('.highscore.txt', 'utf8');
   console.log(lastHighScore);
 
   resetDungeon();
