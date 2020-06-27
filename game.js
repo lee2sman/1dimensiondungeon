@@ -6,12 +6,11 @@
 //globals
 const fs = require('fs');
 
-let hp=8, playerLevel = 1, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
-let dungeon = ['.','.','.','.','.','.','.','.','.','.','.','.','.','.','.','.'];
+let hp=4, playerLevel = 1, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
 let playerX = 0;
 let killed = 0;
 let lastMonster = '';
-let monsters = [];
+let monsters, dungeons;
 let monstersList = {'k':'kobold','j':'jackal','b':'bat','r':'rat','m':'monkey','l':'leprechaun','g':'goblin','f':'flick','e':'floating eyeball','h':'hobgoblin','o':'orc','s':'snake','T':'toad','v':'vampire','w':'werewolf','y':'yeti','a':'fire ant','c':'cockatrice','d':'hell dog','i':'ice demon','n':'wood nymph','p':'iron piercer','q':'quagga','t':'trapper','u':'black unicorn','x':'xorn','z':'elf zombie','A':'archon','B':'vampire bat','C':'centaur','D':'pink dragon','E':'air elemental','F':'animated fungus','G':'gnome king','H':'hill giant','I':'imp','J':'pink jelly','K':'Keystone Kop','L':'arch-lich','M':'mummy','N':'naga','O':'ogre','P':'black pudding','Q':'quacker','R':'rust monster','S':'cave spider','U':'ugly worm','V':'vampire','W':'ring wraith','X':'lil xan','Y':'yowler','Z':'zruty'};
 
 start();
@@ -71,7 +70,9 @@ function main(){
 function checkKeys(str, key){
    if (key.ctrl && key.name === 'c') {
       end();
-    } else if ((key.name === 'left' || key.name === 'h') && playerX > 0){
+
+     //MOVE LEFT SECTION / IF you are not on left-most visible square
+    } else if ((key.name === 'left' || key.name === 'h') && playerX > 1){
 
           let monsterPresence = false;
 	  for (monster in monsters){
@@ -79,7 +80,6 @@ function checkKeys(str, key){
 	        monsterPresence = true;
                 hitMonster(monsters,monster);
 	     }
-      
 	  }
 
         if (dungeon[playerX-1] == '*'){
@@ -94,15 +94,42 @@ function checkKeys(str, key){
 	    dungeon[playerX] = '@';
 	}
           
-    } else if ((key.name === 'right' || key.name === 'l') && playerX < dungeon.length-1){
+    } else if ((key.name === 'left' || key.name === 'h') && playerX == 1){
+   //player on left most visible space wants to move left. move whole board to left
 
+      let monsterPresence = false;
+	  for (monster in monsters){
+             if (monsters[monster].x == (playerX-1)){
+	        monsterPresence = true;
+                hitMonster(monsters,monster);
+	     }
+	  }
+
+
+         for (monster in monsters){ //loop through all monsters to see if they were on right
+	     if (monsters[monster].x == dungeon.length-1){ //if it was on right, remove it from monsters array
+	       monsters.splice(monster,1);
+	     } else { //otherwise, change its saved x position
+	       monsters[monster].x++;
+	     }
+	  }
+
+      //PLAYER IS AT FAR LEFT and wants to move left
+	if (!(monsterPresence)){ //no monster there
+	  dungeon[playerX] = '.'; //replace player current space with blank
+          dungeon[playerX-1] = '@'; //move player left one space
+	  dungeon.unshift('.'); //add space to beginning of array
+	  dungeon.splice(-1,1); //rm last dungeon space from end
+	}
+
+      //MOVE RIGHT IF you are not on the most right visible space
+    } else if ((key.name === 'right' || key.name === 'l') && playerX < dungeon.length-2){
       let monsterPresence = false;
 	  for (monster in monsters){
              if (monsters[monster].x == (playerX+1)){
 	        monsterPresence = true;
                 hitMonster(monsters,monster);
 	     }
-      
 	  }
 
         if (dungeon[playerX+1] == '*'){
@@ -117,10 +144,41 @@ function checkKeys(str, key){
           dungeon[playerX] = '@';
 	}
 
-    } else if ((key.sequence === '.') || (key.name === 'space')){
+    } else if ((key.name === 'right' || key.name === 'l') && (playerX == dungeon.length-2)){
+
+         for (monster in monsters){ //loop through all monsters to see if they were on left
+	     if (monsters[monster].x == 0){ //if it was on left, remove it from monsters array
+	       monsters.splice(monster,1);
+	     } else { //otherwise, change its saved x position
+	       monsters[monster].x--;
+	     }
+	  }
+
+      let monsterPresence = false;
+	  for (monster in monsters){
+             if (monsters[monster].x == (playerX+1)){
+	        monsterPresence = true;
+                hitMonster(monsters,monster);
+	     }
+	  }
+
+
+      //PLAYER IS AT FAR RIGHT and wants to move right
+      //
+      //TODO: CHECK IF MONSTER IS TO THE RIGHT BEFORE MOVING ASWELL
+	if (!(monsterPresence)){ //no monster there
+	  dungeon[playerX] = '.'; //replace player current space with blank
+	  dungeon[playerX+1] = '@'; //move player right a space
+	  dungeon.push('.'); //add space to end
+	  dungeon.splice(0,1); //rm 0th dungeon space from left
+	}
+	           
+   } else if ((key.sequence === '.') || (key.name === 'space')){
 
     } else if (key.name === 'q' && potions > 0){
 
+    } else if (key.sequence === 'Q'){ //quit
+      end();
     } else if (key.name === 'r'){
 
     } else if (key.name === 'i'){
@@ -141,8 +199,6 @@ function checkKeys(str, key){
       console.log();
       help(str, key);
         }
-
-
 }
 
 function help(str, key){
@@ -159,6 +215,7 @@ function help(str, key){
       console.log('(q) quaff');
       console.log('(r) read scroll');
       console.log('(d) debug mode toggle on/off');
+      console.log('(Q) Quit');
   //USEFUL FOR DEBUGGING
   if (debugMode){
       console.log(key);
@@ -174,15 +231,16 @@ function spawnGold(){
 }
 
 function increaseHealth(){
-  if (Math.random()<0.25){ //25% chance of player's life increasing
-    if (hp<(8*playerLevel)){ //can't increase life above a limit
+  //regeneration
+  if (Math.random()<0.2){ //20% chance of player's life increasing
+    if (hp<(4*playerLevel)){ //can't increase life above a limit
       hp+=Math.round(Math.random()*playerLevel)
     }
   }
 }
 
 function spawnMonster(){
-      if ((dungeon[0].toLowerCase() == dungeon[0].toUpperCase()) || (dungeon[dungeon.length-1].toLowerCase() == dungeon[dungeon.length-1].toUpperCase())) { //is there room for a monster to spawn on left or right?
+      if ((dungeon[0].toLowerCase() == dungeon[0].toUpperCase()) || (dungeon[dungeon.length-1].toLowerCase() == dungeon[dungeon.length-1].toUpperCase()) && (dungeon[0] !== '@' || dungeon[dungeon.length-1] !== '@')) { //is there room for a monster to spawn on left or right?
 	//spawn monster
 	monster = new Monster();
 	monsters.push(monster);
@@ -212,9 +270,9 @@ function moveMonsters(){
 	    hp-=monsters[monster].attack;
 	    //console.log('player hp: '+hp);
 	    //monster loses some hp
-	    hitMonster(monsters, monster);
+	    //hitMonster(monsters, monster);
 
-	  } else if (monsters[monster].x>(playerX+1)){
+	  } else if (monsters[monster].x>(playerX+1)){ //if monster more than 1 space away to right
 	     dungeon[monsters[monster].x] = '.';
              monsters[monster].x--;
 	     dungeon[monsters[monster].x] = monsters[monster].name;
@@ -225,7 +283,7 @@ function moveMonsters(){
 	    hp-=monsters[monster].attack;
 	    //console.log('player hp: '+hp);
 	    //monster loses some hp
-	    hitMonster(monsters, monster);
+	    //hitMonster(monsters, monster);
 	  }
 
       }
@@ -249,7 +307,8 @@ function drawScreen(){
     //DRAW SCREEN
     var printdungeon = ''
 
-    for (var index in dungeon){ //loop through all spaces
+    //for (var index in dungeon){ //loop through all spaces
+    for (let index = 1; index < dungeon.length - 1; index++){ //loop through all spaces except 0th and last (so player can't see ends)
 
       if (dungeon[index] == '.'){ //there's nothing there
 	  printdungeon+='.'; //so add a dot
@@ -343,21 +402,20 @@ class Monster {
   
    this.name = char.charAt(Math.floor(Math.random()*(playerLevel*2)));
    this.hp = Math.ceil(Math.random()*hp); 
-   this.attack = Math.ceil(Math.random()*(this.hp/3)); //attack is based on monster's hp
+   this.attack = Math.ceil(Math.random()*(this.hp)); //attack is based on monster's hp
    this.aggression = Math.random();
 
 //choose x location
-   if ((dungeon[0].toLowerCase() == dungeon[0].toUpperCase()) && (dungeon[dungeon.length-1].toLowerCase() == dungeon[dungeon.length-1].toUpperCase())) { //there is no monster on left AND no monster on right
-       if (Math.random()<0.5){
-           this.x = 0; //spawn on left
-       } else {
-           this.x = dungeon.length - 1; //spawn on right
+       if ((dungeon[dungeon.length-1] !== '@' && dungeon[0] !== '@') && (dungeon[dungeon.length-1].toLowerCase() !== dungeon[dungeon.length-1].toUpperCase()) && (dungeon[0].toLowerCase() !== dungeon[0].toUpperCase())    ){//edges are free, so can spawn anywhere
+	if (Math.random()<0.5){this.x = 0;} else {this.x = dungeon.length-1;}
        }
-   } else if (dungeon[0].toLowerCase() == dungeon[0].toUpperCase()) { //there is room for monster on left
-          this.x = 0; //spawn on left
-   } else {   //otherwise there is room for monster on right
-          this.x = dungeon.length - 1;
-   }
+   else if (dungeon[dungeon.length-1] == '@' || (dungeon[dungeon.length-1].toLowerCase() !== dungeon[dungeon.length-1].toUpperCase())  ){ //check to see if player or a monster on right
+           this.x = 0; //spawn on left
+       }
+     else {
+           this.x = dungeon.length - 1; //spawn on right
+     }
+
 
    //put monster in dungeon in position
     dungeon[this.x] = this.name;
