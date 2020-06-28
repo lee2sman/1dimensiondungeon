@@ -2,6 +2,26 @@
 
 by lee2sman 2020
 
+## To launch
+
+```
+node game.js
+```
+
+## Controls
+
+Motion:
+
+Left and Right Arrow keys or Vim-keys
+
+Space or . to pause
+
+? for help
+
+Q or Ctrl-C to quit
+
+## About 
+
 I hacked this together in a number of hours one day. This is probably my 5th or 6th attempt at building my own mini roguelike engine, and I finally succeeded. 
 
 This is not even a remotely enjoyable game yet!
@@ -18,20 +38,13 @@ Can also be modified to work in vertical orientation instead of horizontally, no
 
 Suffice it to say: LOTS OF BUGS!
 
-## To launch
-
-```
-node game.js
-```
-
 #### Things to add:
 - [ ] stairs
 - [ ] potions (teleport? kill a random enemy? spawn a random enemy?)
 - [ ] scrolls? or maybe that's too much
 - [X] scrolling! 
-- [ ] and persistence
-- [ ] better core mechanic
-
+- [ ] persistence
+- [ ] better core mechanics
 
 ### License
 
