@@ -44,11 +44,10 @@ Can also be modified to work in vertical orientation instead of horizontally, no
 Suffice it to say: LOTS OF BUGS!
 
 #### Things to add:
-- [ ] stairs
+- [X] stairs
 - [ ] potions (teleport? kill a random enemy? spawn a random enemy?)
 - [ ] scrolls? or maybe that's too much
 - [X] scrolling! 
-- [ ] persistence
 - [ ] better core mechanics
 
 ### License
