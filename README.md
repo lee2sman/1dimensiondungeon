@@ -25,11 +25,12 @@ node game.js
 ```
 
 #### Things to add:
-- stairs
-- potions (teleport? kill a random enemy? spawn a random enemy?)
-- scrolls? or maybe that's too much
-- scrolling! and persistence
-- better core mechanic
+- [ ] stairs
+- [ ] potions (teleport? kill a random enemy? spawn a random enemy?)
+- [ ] scrolls? or maybe that's too much
+- [X] scrolling! 
+- [ ] and persistence
+- [ ] better core mechanic
 
 
 ### License
