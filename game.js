@@ -97,7 +97,7 @@ function spawnStairs(){
   while (stairsX === playerX);
 
   if (playerLevel < 16){
-    dungeon[stairsX] = '>';
+    dungeon[stairsX] = '<';
   } else {
     dungeon[stairsX] = '%'; //spawn amulet, retrieve to leave!
   }
@@ -116,7 +116,7 @@ function main(){
 
     //redraw stairs
     if (playerLevel < 16){
-      dungeon[stairsX]='>';
+      dungeon[stairsX]='<';
     } else {
       dungeon[stairsX]='%';
     }
@@ -141,6 +141,7 @@ function main(){
 
   });
   console.log('Press any key...');
+  console.log('(?) for help');
 }
 
 function checkKeys(str, key){
@@ -259,14 +260,15 @@ function checkKeys(str, key){
       end();
     } else if (key.name === 'r'){
 
-    } else if (key.sequence === '>'){
+    } else if (key.sequence === '<'){
       if (playerX == stairsX){
-        resetDungeon();
         //add some hp when you descend
-        hp+=Math.round(Math.random()*(playerLevel/2))
+        hp+=Math.round(Math.random()*(playerLevel/4))
+        //draw new floor
+        resetDungeon();
       }
     } else if (key.name === 'i'){
-
+       inventory();
     } else if (key.name === 'd'){
       debugMode=!debugMode;
       if (debugMode){
@@ -285,9 +287,12 @@ function checkKeys(str, key){
         }
 }
 
+function inventory(){
+  console.log('potions: '+potions+' scrolls: '+scrolls+' gold: '+gold);
+  console.log();
+}
+
 function help(str, key){
-  console.log('potions: '+potions+' scrolls: '+scrolls+' killed: '+killed);
-      console.log();
       console.log('Motion: LEFT        REST       RIGHT');
       console.log();
       console.log('        h OR ← | . OR (space) | r OR → ');
@@ -295,9 +300,10 @@ function help(str, key){
       console.log('Commands:');
       console.log();
       console.log('(?) help (this menu)');
-      console.log('(i) inventory');
-      console.log('(q) quaff');
-      console.log('(r) read scroll');
+      console.log('(<) descend stairs (or retrieve amulet)');
+      //console.log('(i) inventory');
+      //console.log('(q) quaff');
+      //console.log('(r) read scroll');
       console.log('(d) debug mode toggle on/off');
       console.log('(Q) Quit');
   //USEFUL FOR DEBUGGING
@@ -377,10 +383,12 @@ function moveMonsters(){
 
 function hitMonster(monsters,monster){
     monsters[monster].hp-=playerLevel;
+    console.log('You hit the '+ monstersList[monsters[monster].name]);
 
 	    if (monsters[monster].hp<=0){
 	      dungeon[monsters[monster].x] = '.';
 	      killed++;
+	      console.log('You killed the '+monstersList[monsters[monster].name]+'!');
 	      //remove monster
               monsters.splice(monster, 1);
 	    }
@@ -402,8 +410,8 @@ function drawScreen(){
           printdungeon+='*';
       }
 
-      if (dungeon[index] == '>'){
-          printdungeon+='>';
+      if (dungeon[index] == '<'){
+          printdungeon+='<';
       }
       if (dungeon[index] == '%'){
           printdungeon+='%';
@@ -454,7 +462,7 @@ function checkIfWon(){
     console.log('\033[2J');
     console.log('Congratulations on your success braving the Dim Dungeon!');
     console.log('You are one of the very few adventures to make it out alive!');
-    console.log('Your name will be written into the history books!');
+    console.log('Your name will be forever written into the history books!');
     printOutAndQuit();  
   }
 }
@@ -487,7 +495,7 @@ function end(){
 }
 
 function printOutAndQuit(){
-      console.log('You killed: '+killed+' monsters and found '+gold+' gold.');
+      console.log('You killed '+killed+' monsters, '+hp+'hp and found '+gold+' gold.');
   //write to file
   //
   let score = 'Level: '+playerLevel+' Killed: '+killed+' Gold: '+gold;
