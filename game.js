@@ -6,18 +6,52 @@
 //globals
 const fs = require('fs');
 
-let hp=4, playerLevel = 1, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
+let hp=4, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
 let playerX = 0;
+let stairsX;
 let killed = 0;
 let lastMonster = '';
-let monsters, dungeon = [], dungeonStartLength=8;
+let monsters = [], dungeon = [], dungeonStartLength=24;
 let monstersList = {'k':'kobold','j':'jackal','b':'bat','r':'rat','m':'monkey','l':'leprechaun','g':'goblin','f':'flick','e':'floating eyeball','h':'hobgoblin','o':'orc','s':'snake','T':'toad','v':'vampire','w':'werewolf','y':'yeti','a':'fire ant','c':'cockatrice','d':'hell dog','i':'ice demon','n':'wood nymph','p':'iron piercer','q':'quagga','t':'trapper','u':'black unicorn','x':'xorn','z':'elf zombie','A':'archon','B':'vampire bat','C':'centaur','D':'pink dragon','E':'air elemental','F':'animated fungus','G':'gnome king','H':'hill giant','I':'imp','J':'pink jelly','K':'Keystone Kop','L':'arch-lich','M':'mummy','N':'naga','O':'ogre','P':'black pudding','Q':'quacker','R':'rust monster','S':'cave spider','U':'ugly worm','V':'vampire','W':'ring wraith','X':'lil xan','Y':'yowler','Z':'zruty'};
+
+
+class Monster {
+ constructor() {
+   let char = 'kjbrmlgfehosTvwyacdinpqtuxzABCDEFGHIJKLMNOPQRSUVWXYZ';
+  
+   this.name = char.charAt(Math.floor(Math.random()*(playerLevel*2)));
+   this.hp = Math.ceil(Math.random()*hp); 
+   this.attack = Math.ceil(Math.random()*(this.hp)); //attack is based on monster's hp
+   this.aggression = Math.random();
+
+//choose x location
+       if ((dungeon[dungeon.length-1] !== '@' && dungeon[0] !== '@') && (dungeon[dungeon.length-1].toLowerCase() !== dungeon[dungeon.length-1].toUpperCase()) && (dungeon[0].toLowerCase() !== dungeon[0].toUpperCase())    ){//edges are free, so can spawn anywhere
+	if (Math.random()<0.5){this.x = 0;} else {this.x = dungeon.length-1;}
+       }
+   else if (dungeon[dungeon.length-1] == '@' || (dungeon[dungeon.length-1].toLowerCase() !== dungeon[dungeon.length-1].toUpperCase())  ){ //check to see if player or a monster on right
+           this.x = 0; //spawn on left
+       }
+     else {
+           this.x = dungeon.length - 1; //spawn on right
+     }
+
+
+   //put monster in dungeon in position
+    dungeon[this.x] = this.name;
+
+ }
+
+}
+
 
 start();
 main();
 
 
 function start(){
+  //clear screen to start
+    console.log('\033[2J');
+
   console.log('Welcome to One Dim Dungeon 1dimensional roguelike');
   console.log();
   console.log('Last score:');
@@ -28,12 +62,45 @@ function start(){
 }
 
 function resetDungeon(){
+  playerLevel++;
   monsters = [];
+  dungeon = [];
   //
+  dungeonStartLength = Math.ceil(Math.random()*20)+6; //dungeons are 6 - 26 in length
+
   for (let i = 0; i < dungeonStartLength; i++){
     dungeon.push('.');
   }
-  dungeon[playerX] = '@'
+
+  //spawn gold potentially, 25% chance
+    if (Math.random()<0.25){
+       //spawn gold
+       spawnGold();
+    }
+
+  spawnStairs();
+
+  //spawn 2 monsters
+  spawnMonster();
+  spawnMonster();
+
+  //place player
+  playerX = Math.ceil(Math.random()*(dungeon.length-1))
+  dungeon[playerX] = '@';
+}
+
+
+function spawnStairs(){
+  do {
+    stairsX = Math.ceil(Math.random()*(dungeon.length-2))
+  }
+  while (stairsX === playerX);
+
+  if (playerLevel < 16){
+    dungeon[stairsX] = '>';
+  } else {
+    dungeon[stairsX] = '%'; //spawn amulet, retrieve to leave!
+  }
 }
 
 function main(){
@@ -47,16 +114,20 @@ function main(){
 
     increaseHealth();
 
+    //redraw stairs
+    if (playerLevel < 16){
+      dungeon[stairsX]='>';
+    } else {
+      dungeon[stairsX]='%';
+    }
+
+    //redraw goldX?
+
     checkKeys(str, key);
 
     moveMonsters();
 
-    if (Math.random()<0.02){
-       //spawn gold
-       spawnGold();
-    }
-
-    if (Math.random()<0.10){ //10% chance of spawn a monster each move
+    if (Math.random()<0.30){ //30% chance of spawn a monster each move
       spawnMonster();
     }
     
@@ -65,6 +136,8 @@ function main(){
     levelUp();
 
     drawScreen();
+
+    checkIfWon();
 
   });
   console.log('Press any key...');
@@ -86,10 +159,11 @@ function checkKeys(str, key){
 	  }
 
         if (dungeon[playerX-1] == '*'){
-	   tempGold = Math.ceil(Math.random()*20);
+	   tempGold = Math.ceil(Math.random()*(10*playerLevel));
 	   console.log('You found '+tempGold+' gold.');
 	   gold+=tempGold;
 	}
+
 
 	if (!(monsterPresence)){ //no monster there
 	    dungeon[playerX] = '.';
@@ -141,6 +215,7 @@ function checkKeys(str, key){
 	   gold+=tempGold;
 	}
 
+
 	if (!(monsterPresence)){ //no monster there
           dungeon[playerX] = '.';
           playerX++;
@@ -184,6 +259,12 @@ function checkKeys(str, key){
       end();
     } else if (key.name === 'r'){
 
+    } else if (key.sequence === '>'){
+      if (playerX == stairsX){
+        resetDungeon();
+        //add some hp when you descend
+        hp+=Math.round(Math.random()*(playerLevel/2))
+      }
     } else if (key.name === 'i'){
 
     } else if (key.name === 'd'){
@@ -321,6 +402,13 @@ function drawScreen(){
           printdungeon+='*';
       }
 
+      if (dungeon[index] == '>'){
+          printdungeon+='>';
+      }
+      if (dungeon[index] == '%'){
+          printdungeon+='%';
+      }
+
       for (var monster in monsters){ //loop through monsters in array
             if (monsters[monster].x == index){ //if monster is at that position
                printdungeon+=monsters[monster].name; //add it there
@@ -351,13 +439,23 @@ function drawScreen(){
 
 function levelUp(){
   console.log('level: '+playerLevel);
-   playerLevel = Math.floor(killed/7+1);
+   //playerLevel = Math.floor(killed/7+1);
 }
 
 function checkHealth(){
   console.log('hp: '+hp);
   if (hp <= 0){
     end();
+  }
+}
+
+function checkIfWon(){
+  if (playerLevel>16){
+    console.log('\033[2J');
+    console.log('Congratulations on your success braving the Dim Dungeon!');
+    console.log('You are one of the very few adventures to make it out alive!');
+    console.log('Your name will be written into the history books!');
+    printOutAndQuit();  
   }
 }
 
@@ -385,6 +483,10 @@ function end(){
                              -  \\)`);
       console.log('You died!');
       console.log('You were killed by a '+monstersList[lastMonster]+' on level '+playerLevel);
+      printOutAndQuit();
+}
+
+function printOutAndQuit(){
       console.log('You killed: '+killed+' monsters and found '+gold+' gold.');
   //write to file
   //
@@ -396,33 +498,7 @@ function end(){
       console.log();
       console.log('goodbye');
       process.exit();
-}
-
-
-class Monster {
- constructor() {
-   let char = 'kjbrmlgfehosTvwyacdinpqtuxzABCDEFGHIJKLMNOPQRSUVWXYZ';
-  
-   this.name = char.charAt(Math.floor(Math.random()*(playerLevel*2)));
-   this.hp = Math.ceil(Math.random()*hp); 
-   this.attack = Math.ceil(Math.random()*(this.hp)); //attack is based on monster's hp
-   this.aggression = Math.random();
-
-//choose x location
-       if ((dungeon[dungeon.length-1] !== '@' && dungeon[0] !== '@') && (dungeon[dungeon.length-1].toLowerCase() !== dungeon[dungeon.length-1].toUpperCase()) && (dungeon[0].toLowerCase() !== dungeon[0].toUpperCase())    ){//edges are free, so can spawn anywhere
-	if (Math.random()<0.5){this.x = 0;} else {this.x = dungeon.length-1;}
-       }
-   else if (dungeon[dungeon.length-1] == '@' || (dungeon[dungeon.length-1].toLowerCase() !== dungeon[dungeon.length-1].toUpperCase())  ){ //check to see if player or a monster on right
-           this.x = 0; //spawn on left
-       }
-     else {
-           this.x = dungeon.length - 1; //spawn on right
-     }
-
-
-   //put monster in dungeon in position
-    dungeon[this.x] = this.name;
-
- }
 
 }
+
+
