@@ -16,9 +16,14 @@ Left and Right Arrow keys or Vim-keys
 
 Space or . to pause
 
-? for help
+- ```?``` - help
+- ```<``` - descend stairs (or retrieve amulet)
+- ```d``` - debug mode toggle on/off
+- ```Q``` - quit
 
-Q or Ctrl-C to quit
+## Goal
+
+Collect gold. Descend 16 levels through the dungeon and retrieve the amulet of Yendor. Avoid getting killed.
 
 ## About 
 
