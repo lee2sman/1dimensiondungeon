@@ -43,6 +43,8 @@ Can also be modified to work in vertical orientation instead of horizontally, no
 
 Suffice it to say: LOTS OF BUGS!
 
+Read much more about it (and other 1-dimensional roguelikes and dungeon crawlers) on my Nosebook blog [here](http://leetusman.com/nosebook/one-dimensional-dungeons).
+
 #### Things to add:
 - [X] stairs
 - [ ] potions (teleport? kill a random enemy? spawn a random enemy?)
