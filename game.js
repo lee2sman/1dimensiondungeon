@@ -1,5 +1,6 @@
 //One dim dungeon 
 //by lee2sman 2020
+//welcome to my spaghetti code
 //
 // Copyleft: This is a free work, you can copy, distribute, and modify it under the terms of the Free Art License http://artlibre.org/licence/lal/en/
 
@@ -499,5 +500,3 @@ function printOutAndQuit(){
       process.exit();
 
 }
-
-
