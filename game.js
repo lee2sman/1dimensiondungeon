@@ -17,31 +17,27 @@ let monstersList = {'k':'kobold','j':'jackal','b':'bat','r':'rat','m':'monkey','
 
 
 class Monster {
- constructor() {
+ constructor(pos=null) {
    let char = 'kjbrmlgfehosTvwyacdinpqtuxzABCDEFGHIJKLMNOPQRSUVWXYZ';
   
    this.name = char.charAt(Math.floor(Math.random()*(playerLevel*2)));
-   this.hp = Math.ceil(Math.random()*hp); 
+   this.hp = Math.ceil(Math.random()*hp);  //could instead do this based on what floor
    this.attack = Math.ceil(Math.random()*(this.hp)); //attack is based on monster's hp
    this.aggression = Math.random();
 
 //choose x location
-       if ((dungeon[dungeon.length-1] !== '@' && dungeon[0] !== '@') && (dungeon[dungeon.length-1].toLowerCase() !== dungeon[dungeon.length-1].toUpperCase()) && (dungeon[0].toLowerCase() !== dungeon[0].toUpperCase())    ){//edges are free, so can spawn anywhere
-	if (Math.random()<0.5){this.x = 0;} else {this.x = dungeon.length-1;}
-       }
-   else if (dungeon[dungeon.length-1] == '@' || (dungeon[dungeon.length-1].toLowerCase() !== dungeon[dungeon.length-1].toUpperCase())  ){ //check to see if player or a monster on right
-           this.x = 0; //spawn on left
-       }
-     else {
-           this.x = dungeon.length - 1; //spawn on right
-     }
+   if (pos !== null){
+     this.x = pos;
+   }
+   else {
+     do {
+	this.x = Math.ceil(Math.random()*(dungeon.length-1));
+     } while (this.x == playerX)
+   }
 
-
-   //put monster in dungeon in position
+   //put monster in dungeon in this position //IS THIS SUPPOSED TO BE HERE?
     dungeon[this.x] = this.name;
-
  }
-
 }
 
 
@@ -81,9 +77,17 @@ function resetDungeon(){
 
   spawnStairs();
 
-  //spawn 2 monsters
+  //spawn 2 monsters on edges
   spawnMonster();
   spawnMonster();
+  //place 1 monster somewhere
+  /*
+  do {
+     monsters[monsters.length-1].x = Math.ceil(Math.random()*(dungeon.length-2)
+
+  }
+  while (dungeon[monsters[monsters.length-1].x] == '.')
+  */
 
   //place player
   playerX = Math.ceil(Math.random()*(dungeon.length-2))
@@ -130,7 +134,11 @@ function main(){
     moveMonsters(legitMove);
 
     if (Math.random()<0.30){ //30% chance of spawn a monster each move
-      spawnMonster();
+      if (Math.random()<0.5){ //spawn left
+        spawnMonster(0);
+      } else { //spawn right
+        spawnMonster(dungeon.length-1);
+      }
     }
     
     checkHealth();
@@ -140,7 +148,6 @@ function main(){
     drawScreen();
 
     checkIfWon();
-
   });
   console.log('Press any key...');
   console.log('(?) for help');
@@ -220,7 +227,7 @@ function checkKeys(str, key){
 
           legitMove = true;
 
-    } else if (key.sequence === '<'){
+    } else if (key.name === 'down' || key.sequence === '<'){
 
       if (playerX == stairsX){
         //add some hp when you descend
@@ -261,7 +268,7 @@ function help(str, key){
       console.log('Commands:');
       console.log();
       console.log('(?) help (this menu)');
-      console.log('(<) descend stairs (or retrieve amulet)');
+      console.log('(↓) or (<) descend stairs/retrieve amulet)');
       //console.log('(i) inventory');
       //console.log('(q) quaff');
       //console.log('(r) read scroll');
@@ -290,10 +297,10 @@ function increaseHealth(){
   }
 }
 
-function spawnMonster(){
+function spawnMonster(pos){
       if ((dungeon[0].toLowerCase() == dungeon[0].toUpperCase()) || (dungeon[dungeon.length-1].toLowerCase() == dungeon[dungeon.length-1].toUpperCase()) && (dungeon[0] !== '@' || dungeon[dungeon.length-1] !== '@')) { //is there room for a monster to spawn on left or right?
 	//spawn monster
-	monster = new Monster();
+	monster = new Monster(pos);
 	monsters.push(monster);
 	if (debugMode){
 	  console.log('created a monster!');
@@ -379,6 +386,12 @@ function hitMonster(monsters,monster){
 
 	    if (monsters[monster].hp<=0){
 	      dungeon[monsters[monster].x] = '.';
+
+	      //redraw stairs if that was in the same position
+	      if (dungeon[monsters[monster].x] == stairsX){
+	        dungeon[monsters[monster].x] = '<';
+	      }
+
 	      killed++;
 	      console.log('You killed the '+monstersList[monsters[monster].name]+'!');
 	      //remove monster
