@@ -45,14 +45,9 @@ Suffice it to say: LOTS OF BUGS!
 
 Read much more about it (and other 1-dimensional roguelikes and dungeon crawlers) on my Nosebook blog [here](http://leetusman.com/nosebook/one-dimensional-dungeons).
 
-#### Things to add:
-- [X] stairs
-- [ ] potions (teleport? kill a random enemy? spawn a random enemy?)
-- [ ] scrolls? or maybe that's too much
-- [X] scrolling! 
-- [ ] better core mechanics
-- [ ] add varied terrain? locked doors with keys on other side of level?
-- [ ] varied enemy behaviors including attacks
+## Roadmap
+
+See [ROADMAP](ROADMAP.md)
 
 ### License
 
