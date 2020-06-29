@@ -49,6 +49,8 @@ Suffice it to say: LOTS OF BUGS!
 - [ ] scrolls? or maybe that's too much
 - [X] scrolling! 
 - [ ] better core mechanics
+- [ ] add varied terrain? locked doors with keys on other side of level?
+- [ ] varied enemy behaviors including attacks
 
 ### License
 
