@@ -85,7 +85,7 @@ function resetDungeon(){
   spawnMonster();
 
   //place player
-  playerX = Math.ceil(Math.random()*(dungeon.length-1))
+  playerX = Math.ceil(Math.random()*(dungeon.length-2))
   dungeon[playerX] = '@';
 }
 
@@ -123,9 +123,10 @@ function main(){
 
     //redraw goldX?
 
-    checkKeys(str, key);
 
-    moveMonsters();
+    checkKeys(str, key, legitMove = false);
+
+    moveMonsters(legitMove);
 
     if (Math.random()<0.30){ //30% chance of spawn a monster each move
       spawnMonster();
@@ -150,6 +151,8 @@ function checkKeys(str, key){
 
      //MOVE LEFT SECTION / IF you are not on left-most visible square
     } else if ((key.name === 'left' || key.name === 'h') && playerX > 1){
+          
+          legitMove = true;
 
           let monsterPresence = false;
 	  for (monster in monsters){
@@ -168,40 +171,18 @@ function checkKeys(str, key){
 
 	if (!(monsterPresence)){ //no monster there
 	    dungeon[playerX] = '.';
+	    if (playerX == stairsX){//check if there are stairs there and if so redraw them
+               dungeon[playerX] = '<';
+	    }
 	    playerX--;
 	    dungeon[playerX] = '@';
 	}
           
-    } else if ((key.name === 'left' || key.name === 'h') && playerX == 1){
-   //player on left most visible space wants to move left. move whole board to left
-
-      let monsterPresence = false;
-	  for (monster in monsters){
-             if (monsters[monster].x == (playerX-1)){
-	        monsterPresence = true;
-                hitMonster(monsters,monster);
-	     }
-	  }
-
-
-         for (monster in monsters){ //loop through all monsters to see if they were on right
-	     if (monsters[monster].x == dungeon.length-1){ //if it was on right, remove it from monsters array
-	       monsters.splice(monster,1);
-	     } else { //otherwise, change its saved x position
-	       monsters[monster].x++;
-	     }
-	  }
-
-      //PLAYER IS AT FAR LEFT and wants to move left
-	if (!(monsterPresence)){ //no monster there
-	  dungeon[playerX] = '.'; //replace player current space with blank
-          dungeon[playerX-1] = '@'; //move player left one space
-	  dungeon.unshift('.'); //add space to beginning of array
-	  dungeon.splice(-1,1); //rm last dungeon space from end
-	}
-
       //MOVE RIGHT IF you are not on the most right visible space
     } else if ((key.name === 'right' || key.name === 'l') && playerX < dungeon.length-2){
+
+          legitMove = true;
+
       let monsterPresence = false;
 	  for (monster in monsters){
              if (monsters[monster].x == (playerX+1)){
@@ -219,40 +200,16 @@ function checkKeys(str, key){
 
 	if (!(monsterPresence)){ //no monster there
           dungeon[playerX] = '.';
+	  if (playerX == stairsX){//check if there are stairs there and if so redraw them
+               dungeon[playerX] = '<';
+	  }
           playerX++;
           dungeon[playerX] = '@';
 	}
 
-    } else if ((key.name === 'right' || key.name === 'l') && (playerX == dungeon.length-2)){
-
-         for (monster in monsters){ //loop through all monsters to see if they were on left
-	     if (monsters[monster].x == 0){ //if it was on left, remove it from monsters array
-	       monsters.splice(monster,1);
-	     } else { //otherwise, change its saved x position
-	       monsters[monster].x--;
-	     }
-	  }
-
-      let monsterPresence = false;
-	  for (monster in monsters){
-             if (monsters[monster].x == (playerX+1)){
-	        monsterPresence = true;
-                hitMonster(monsters,monster);
-	     }
-	  }
-
-
-      //PLAYER IS AT FAR RIGHT and wants to move right
-      //
-      //TODO: CHECK IF MONSTER IS TO THE RIGHT BEFORE MOVING ASWELL
-	if (!(monsterPresence)){ //no monster there
-	  dungeon[playerX] = '.'; //replace player current space with blank
-	  dungeon[playerX+1] = '@'; //move player right a space
-	  dungeon.push('.'); //add space to end
-	  dungeon.splice(0,1); //rm 0th dungeon space from left
-	}
-	           
    } else if ((key.sequence === '.') || (key.name === 'space')){
+
+          legitMove = true;
 
     } else if (key.name === 'q' && potions > 0){
 
@@ -260,7 +217,10 @@ function checkKeys(str, key){
       end();
     } else if (key.name === 'r'){
 
+          legitMove = true;
+
     } else if (key.sequence === '<'){
+
       if (playerX == stairsX){
         //add some hp when you descend
         hp+=Math.round(Math.random()*(playerLevel/4))
@@ -342,17 +302,31 @@ function spawnMonster(){
 
 }
 
-function moveMonsters(){
+function moveMonsters(legitMove){
+  if (legitMove){
     for (var monster in monsters){
       if (Math.random()<monsters[monster].aggression){ //is monster provoked?
 	if (debugMode){
           console.log(monsters[monster].name+' is angry!');
 	}
 
-	  if (monsters[monster].x<(playerX-1)){ //if monster to left and more than 1 away
-	    dungeon[monsters[monster].x] = '.';
-	    monsters[monster].x++;
-	    dungeon[monsters[monster].x] = monsters[monster].name;
+	  if (monsters[monster].x<(playerX-1)){ //if monster to left and player more than 1 away
+	    let noMonsterAdjacent = true;
+	    for (otherMonster in monsters){
+                if (monsters[otherMonster].x == monsters[monster].x + 1){
+		  noMonsterAdjacent = false;
+		}
+	    }
+	      if (noMonsterAdjacent){//no monster to immediate right, move right
+		dungeon[monsters[monster].x] = '.';
+  
+		if (monsters[monster].x == stairsX){//check if there are stairs there and if so redraw them
+		     dungeon[monsters[monster].x] = '<';
+		}
+
+		monsters[monster].x++;
+		dungeon[monsters[monster].x] = monsters[monster].name;
+	      }
 	  } else if (monsters[monster].x == (playerX-1)){
             console.log('The '+monstersList[monsters[monster].name]+ ' hit you!');
 	    lastMonster=monsters[monster].name;
@@ -362,10 +336,26 @@ function moveMonsters(){
 	    //monster loses some hp
 	    //hitMonster(monsters, monster);
 
-	  } else if (monsters[monster].x>(playerX+1)){ //if monster more than 1 space away to right
-	     dungeon[monsters[monster].x] = '.';
-             monsters[monster].x--;
-	     dungeon[monsters[monster].x] = monsters[monster].name;
+	  } else if (monsters[monster].x>(playerX+1)){ //if monster more than 1 space away to right of player
+              
+	    let noMonsterAdjacent = true;
+		for (otherMonster in monsters){
+		    if (monsters[otherMonster].x == monsters[monster].x - 1){
+		      noMonsterAdjacent = false;
+		    }
+		}
+
+	      if (noMonsterAdjacent){//no monster is to immediate left so move monster left
+		 dungeon[monsters[monster].x] = '.';
+
+		if (monsters[monster].x == stairsX){//check if there are stairs there and if so redraw them
+		     dungeon[monsters[monster].x] = '<';
+		}
+
+		 monsters[monster].x--;
+		 dungeon[monsters[monster].x] = monsters[monster].name;
+	      }
+
 	  } else if (monsters[monster].x == playerX+1){
             console.log('The '+monstersList[monsters[monster].name]+ ' hit you!');
 	    lastMonster=monsters[monster].name;
@@ -379,6 +369,7 @@ function moveMonsters(){
       }
 
     }
+  }
 }
 
 function hitMonster(monsters,monster){
@@ -397,6 +388,7 @@ function hitMonster(monsters,monster){
 function drawScreen(){
 
     //DRAW SCREEN
+
     var printdungeon = ''
 
     //for (var index in dungeon){ //loop through all spaces
@@ -435,7 +427,6 @@ function drawScreen(){
     //print it out
   //USEFUL IN DEBUGGING
     //console.log(dungeon);
-    //console.log('dungeon: ');
     
     //print floor
     console.log('floor: '+floor);
