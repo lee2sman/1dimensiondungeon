@@ -51,5 +51,7 @@ See [ROADMAP](ROADMAP.md)
 
 ### License
 
-Copyleft: This is a free work. You can copy, distribute, and modify it under the terms of the [Free Art License](http://artlibre.org/licence/lal/en/).
+Copyleft GNU Affero General Public License v3 (AGPL-3.0).
+
+If you use the code you must include this notice, state any changes, publish your source. [Additional info](LICENSE)
 
