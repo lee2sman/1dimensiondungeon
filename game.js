@@ -9,7 +9,7 @@ const fs = require('fs');
 
 let hp=4, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
 let playerX = 0;
-let stairsX;
+let stairsX, goldX = 0;
 let killed = 0;
 let lastMonster = '';
 let monsters = [], dungeon = [], dungeonStartLength=24;
@@ -160,60 +160,12 @@ function checkKeys(str, key){
      //MOVE LEFT SECTION / IF you are not on left-most visible square
     } else if ((key.name === 'left' || key.name === 'h') && playerX > 1){
           
-          legitMove = true;
+   moveLeft();      
 
-          let monsterPresence = false;
-	  for (monster in monsters){
-             if (monsters[monster].x == (playerX-1)){
-	        monsterPresence = true;
-                hitMonster(monsters,monster);
-	     }
-	  }
-
-        if (dungeon[playerX-1] == '*'){
-	   tempGold = Math.ceil(Math.random()*(10*playerLevel));
-	   console.log('You found '+tempGold+' gold.');
-	   gold+=tempGold;
-	}
-
-
-	if (!(monsterPresence)){ //no monster there
-	    dungeon[playerX] = '.';
-	    if (playerX == stairsX){//check if there are stairs there and if so redraw them
-               dungeon[playerX] = '<';
-	    }
-	    playerX--;
-	    dungeon[playerX] = '@';
-	}
-          
       //MOVE RIGHT IF you are not on the most right visible space
     } else if ((key.name === 'right' || key.name === 'l') && playerX < dungeon.length-2){
 
-          legitMove = true;
-
-      let monsterPresence = false;
-	  for (monster in monsters){
-             if (monsters[monster].x == (playerX+1)){
-	        monsterPresence = true;
-                hitMonster(monsters,monster);
-	     }
-	  }
-
-        if (dungeon[playerX+1] == '*'){
-	   tempGold = Math.ceil(Math.random()*20);
-	   console.log('You found '+tempGold+' gold.');
-	   gold+=tempGold;
-	}
-
-
-	if (!(monsterPresence)){ //no monster there
-          dungeon[playerX] = '.';
-	  if (playerX == stairsX){//check if there are stairs there and if so redraw them
-               dungeon[playerX] = '<';
-	  }
-          playerX++;
-          dungeon[playerX] = '@';
-	}
+      moveRight();
 
    } else if ((key.sequence === '.') || (key.name === 'space')){
 
@@ -253,6 +205,67 @@ function checkKeys(str, key){
       console.log();
       help(str, key);
         }
+}
+
+function moveLeft(){
+        legitMove = true;
+
+          let monsterPresence = false;
+	  for (monster in monsters){
+             if (monsters[monster].x == (playerX-1)){
+	        monsterPresence = true;
+                hitMonster(monsters,monster);
+	     }
+	  }
+
+        if (dungeon[playerX-1] == '*'){
+	   tempGold = Math.ceil(Math.random()*(10*playerLevel));
+	   console.log('You found '+tempGold+' gold.');
+	  goldX=0;
+	   gold+=tempGold;
+	}
+
+
+	if (!(monsterPresence)){ //no monster there
+	    dungeon[playerX] = '.';
+	    if (playerX == stairsX){//check if there are stairs there and if so redraw them
+               dungeon[playerX] = '<';
+	    }
+	    playerX--;
+	    dungeon[playerX] = '@';
+	}
+   
+}
+
+function moveRight(){
+          legitMove = true;
+
+      let monsterPresence = false;
+	  for (monster in monsters){
+             if (monsters[monster].x == (playerX+1)){
+	        monsterPresence = true;
+                hitMonster(monsters,monster);
+	     }
+	  }
+
+        if (dungeon[playerX+1] == '*'){
+	   tempGold = Math.ceil(Math.random()*20);
+	   console.log('You found '+tempGold+' gold.');
+	  goldX=0;
+	   gold+=tempGold;
+	}
+
+
+	if (!(monsterPresence)){ //no monster there
+          dungeon[playerX] = '.';
+	  if (playerX == stairsX){//check if there are stairs there and if so redraw them
+               dungeon[playerX] = '<';
+	  }
+          playerX++;
+          dungeon[playerX] = '@';
+	}
+
+
 }
 
 function inventory(){
@@ -356,6 +369,10 @@ function moveMonsters(legitMove){
 	      if (noMonsterAdjacent){//no monster is to immediate left so move monster left
 		 dungeon[monsters[monster].x] = '.';
 
+		if (monsters[monster].x == goldX){//check if gold there and if so redraw 
+		     dungeon[monsters[monster].x] = '*';
+		}
+
 		if (monsters[monster].x == stairsX){//check if there are stairs there and if so redraw them
 		     dungeon[monsters[monster].x] = '<';
 		}
@@ -386,6 +403,11 @@ function hitMonster(monsters,monster){
 
 	    if (monsters[monster].hp<=0){
 	      dungeon[monsters[monster].x] = '.';
+
+	      //redraw gold if that was in the same position
+	      if (dungeon[monsters[monster].x] == goldX){
+	        dungeon[monsters[monster].x] = '*';
+	      }
 
 	      //redraw stairs if that was in the same position
 	      if (dungeon[monsters[monster].x] == stairsX){
@@ -443,7 +465,7 @@ function drawScreen(){
     //console.log(dungeon);
     
     //print floor
-    console.log('floor: '+floor);
+    console.log('gold: '+gold);
     console.log()
 
     console.log(printdungeon);
