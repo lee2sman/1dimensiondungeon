@@ -495,7 +495,7 @@ function end(){
 }
 
 function printOutAndQuit(){
-      console.log('You killed '+killed+' monsters, '+hp+'hp and found '+gold+' gold.');
+      console.log('You killed '+killed+' monsters and found '+gold+' gold.');
   //write to file
   //
   let score = 'Level: '+playerLevel+' Killed: '+killed+' Gold: '+gold;
