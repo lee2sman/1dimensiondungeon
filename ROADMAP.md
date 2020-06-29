@@ -4,6 +4,7 @@
 - [ ] potions 
   - [ ] teleport
   - [ ] get sick ('You were poisoned' and decrease player hp)
+  - [ ] cloak of darkness - cannot see actual board, they are renderes as empty spaces - would need clock feature
   - [ ] spawn a random enemy
   - [ ] agitate monsters (increase their aggression)
   - [ ] dissolving spell. fall through floor
@@ -17,4 +18,7 @@
 - [ ] scrolls? or maybe that's too much
 - [ ] better core mechanics
 - [ ] add varied terrain? locked doors with keys on other side of level?
-- [ ] varied enemy behaviors including attacks, 'hallucination' (like toads in Brogue), generating minions, freezing, etc
+- [ ] varied enemy behaviors including attacks, 'hallucination' (like toads in Brogue) - would need clock feature, generating minions, freezing, etc
+  - [ ] simple clock timeout feature
+- [ ] choose different font, use color (background and on font)
+- [ ] game also output graphically - tiles and/or also runs on web
