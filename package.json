@@ -1,0 +1,29 @@
+{
+  "name": "1dimdungeon",
+  "version": "1.0.0",
+  "description": "a 1-dimensional ASCII roguelike",
+  "main": "game.js",
+  "dependencies": {
+    "chalk": "^4.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lee2sman/1dimensiondungeon.git"
+  },
+  "keywords": [
+    "roguelike",
+    "ascii",
+    "game",
+    "vim"
+  ],
+  "author": "lee2sman",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/lee2sman/1dimensiondungeon/issues"
+  },
+  "homepage": "https://github.com/lee2sman/1dimensiondungeon#readme"
+}
