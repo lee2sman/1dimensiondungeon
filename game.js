@@ -62,13 +62,21 @@ function resetDungeon(){
   playerLevel++;
   monsters = [];
   dungeon = [];
-  //
-  dungeonStartLength = Math.ceil(Math.random()*20)+6; //dungeons are 6 - 26 in length
+  goldX = 0;
+  //potionX = dungeonStartLength - 1;
+  potionX = 0;
+
+  dungeonStartLength = Math.ceil(Math.random()*20)+6; //dungeons are 7 - 26 in length, edges hidden
 
   //superfluous?
   for (let i = 0; i < dungeonStartLength; i++){
     dungeon.push('.');
   }
+
+  //place player
+  playerX = Math.ceil(Math.random()*(dungeon.length-2))
+
+  spawnStairs();
 
   //spawn gold potentially, 25% chance
     if (Math.random()<0.25){
@@ -80,12 +88,8 @@ function resetDungeon(){
        spawnPotion();
     }
 
-  //place player
-  playerX = Math.ceil(Math.random()*(dungeon.length-2))
-
-  spawnStairs();
-
   //spawn 2 monsters 
+  spawnMonster();
   spawnMonster();
   spawnMonster();
 
@@ -283,7 +287,9 @@ function help(str, key){
 }
 
 function spawnGold(){
-  goldX = Math.floor(Math.random()*dungeon.length);
+  do {
+    goldX = Math.floor(Math.random()*dungeon.length);
+  }  while ((goldX == playerX) || (goldX == stairsX));
 }
 
 function spawnPotion(){
