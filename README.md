@@ -23,6 +23,10 @@ To launch with debug mode on:
 
 ```node game.js --debug``` OR ```node game.js -d```
 
+To launch with vertical orientation:
+
+```node game.js --vertical``` OR ```node game.js -v```
+
 ## Controls
 
 You can move with arrows or vim-keys.
@@ -49,7 +53,7 @@ Collect gold. Descend 16 levels through the dungeon and retrieve the amulet of Y
 
 I hacked together the original (buggy) version in a day, then took a few days to add features, refactor, and track down annoying bugs. There may still be more!
 
-Can also be modified to work in vertical orientation instead of horizontally.
+You can now also change the orientation!
 
 **Read much more about it (and other 1-dimensional roguelikes and dungeon crawlers) on my Nosebook blog [here](http://leetusman.com/nosebook/one-dimensional-dungeons).**
 
