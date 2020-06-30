@@ -9,7 +9,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 let lastScore, highScore;
-let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
+let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false, vertical = false;
 let playerX = 0;
 let stairsX, goldX = 0, potionX = 0;
 let killed = 0;
@@ -47,7 +47,7 @@ function start(){
   //clear screen to start
     console.log('\033[2J');
 
-  checkDebugMode();
+  checkFlags();
   checkTerminal();
 
   console.log('Welcome to One Dim Dungeon 1dimensional roguelike');
@@ -180,6 +180,8 @@ function checkKeys(str, key){
       }
     } else if (key.name === 'd'){
         toggleDebugMode();
+    } else if (key.name === 'v'){
+        toggleOrientation();
     } else if (key.sequence === '?'){
        help(str, key);
 
@@ -191,10 +193,13 @@ function checkKeys(str, key){
         }
 }
 
-function checkDebugMode(){
+function checkFlags(){
     for (arg in process.argv){
       if (process.argv[arg] == '-d' || process.argv[arg] == '--debug'){
 	toggleDebugMode();
+      }
+      if (process.argv[arg] == '-v' || process.argv[arg] == '--vertical'){
+	toggleOrientation();
       }
     }
 }
@@ -205,6 +210,15 @@ function toggleDebugMode(){
       console.log('Debug mode: ON');
     } else {
       console.log('Debug mode: OFF');
+    }
+}
+
+function toggleOrientation(){
+    vertical=!vertical;
+    if (vertical){
+      console.log('Vertical orientation');
+    } else {
+      console.log('Horizontal orientation');
     }
 }
 
@@ -279,6 +293,7 @@ function help(str, key){
       console.log('(↓) or (<) or (j) descend stairs/retrieve amulet');
       console.log('(q) or (p)        quaff potion');
       console.log('(d)               debug mode toggle on/off');
+      console.log('(v)		     toggle vertical orientation on/off');
       console.log('(Q)               Quit');
   //USEFUL FOR DEBUGGING
   if (debugMode){
@@ -489,12 +504,18 @@ function drawScreen(){
     for (let i = 0; i < (dungeon.length-1); i++){
        castlewall+='#'
     }
-   // console.log(chalk.red('Hello', chalk.underline.bgBlue('world') + '!'));
-  //  console.log(chalk.green.bgBlue.bold('Hello world!'));
 
+  if (vertical){
+    console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
+    for (let i = 0; i < dungeon.length-2; i++){
+     console.log(chalk.green.bgBlue.bold('#')+chalk.gray.bgMagenta(Array.from(printdungeon)[i])+chalk.green.bgBlue.bold('#'));
+    }
+    console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
+  } else { //horizontal
     console.log(chalk.green.bgBlue.bold(castlewall));
     console.log(chalk.cyan.bgBlue.bold('[')+chalk.gray.bgMagenta(printdungeon)+chalk.green.bgBlue.bold(']'));
     console.log(chalk.green.bgBlue.bold(castlewall));
+  }
 }
 
 function printStats(){
