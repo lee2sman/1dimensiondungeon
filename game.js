@@ -9,7 +9,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 let lastScore, highScore;
-let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false, vertical = false;
+let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false, vertical = false, flipflop = false;
 let playerX = 0;
 let stairsX, goldX = 0, potionX = 0;
 let killed = 0;
@@ -133,15 +133,16 @@ function main(){
 
     checkIfWon();
   });
+  console.log();
   console.log('Press any key...');
   console.log('(?) for help');
 }
 
 function checkTerminal(){
-  if (process.stdout.columns<48){
+  if (process.stdout.columns<48 || process.stdout.rows<22){
     console.log();
     console.log('WARNING:');
-    console.log('1dim dungeon needs a min width of 48.');
+    console.log('1dim dungeon recommends a min width of 48 and height of 22.');
     console.log();
   }
 }
@@ -150,34 +151,26 @@ function checkKeys(str, key){
    if (key.ctrl && key.name === 'c') {
       end();
 
-     //MOVE LEFT SECTION / IF you are not on left-most visible square
-    } else if ((key.name === 'left' || key.name === 'h') && playerX > 1){
+     //MOVE LEFT OR UP, if player not all the way to the left
+    } else if (((!vertical && key.name === 'left') || (!vertical && key.name === 'h') || (vertical && key.name === 'up') || (vertical && key.name === 'k')) && playerX > 1){ 
         legitMove = true;
         moveLeft();      
-      //MOVE RIGHT IF you are not on the most right visible space
-    } else if ((key.name === 'right' || key.name === 'l') && playerX < dungeon.length-2){
+      //MOVE RIGHT OR DOWN, if player not all the way to the right
+    } else if (((!vertical && key.name === 'right') || (!vertical && key.name === 'l') || (vertical && key.name === 'down') || (vertical && key.name === 'j')) && playerX < dungeon.length-2){
       legitMove = true;
       moveRight();
-   } else if ((key.sequence === '.') || (key.name === 'space')){
-
+   } else if ((key.sequence === '.') || (key.name === 'space')){ //rest
           legitMove = true;
-
     } else if ((key.name === 'q' && potions>0) || (key.name === 'p' && potions>0)){
            usePotion();
-    } else if (key.sequence === 'Q'){ //quit
+    } else if (key.sequence === 'Q'){ //quit, case-sensitive
       end();
     } else if (key.name === 'r'){
-
           legitMove = true;
-
-    } else if (key.name === 'down' || key.sequence === '<' || key.name === 'j'){
-
-      if (playerX == stairsX){
-        //add some hp when you descend
-        hp+=Math.round(Math.random()*(playerLevel/4))
-        //draw new floor
-        resetDungeon();
-      }
+    } else if (key.sequence === '<'){
+	if (playerX == stairsX){
+	  descendStairs();
+	}
     } else if (key.name === 'd'){
         toggleDebugMode();
     } else if (key.name === 'v'){
@@ -190,7 +183,7 @@ function checkKeys(str, key){
       console.log('not a command');
       console.log();
       help(str, key);
-        }
+     }
 }
 
 function checkFlags(){
@@ -200,6 +193,9 @@ function checkFlags(){
       }
       if (process.argv[arg] == '-v' || process.argv[arg] == '--vertical'){
 	toggleOrientation();
+      }
+      if (process.argv[arg] == '-f' || process.argv[arg] == '--flip-flop'){
+	flipflop = true;
       }
     }
 }
@@ -278,23 +274,30 @@ function moveRight(){
 	if (!(monsterPresence)){ //no monster there
           playerX++;
 	}
+}
 
+function descendStairs(){
+    //add some hp when you descend
+    hp+=Math.round(Math.random()*(playerLevel/4))
 
+    //draw new floor
+    if (flipflop)(toggleOrientation()) 
+
+    resetDungeon();
 }
 
 function help(str, key){
-      console.log('Motion: LEFT        REST       RIGHT');
-      console.log();
-      console.log('        h OR ← | . OR (space) | r OR → ');
+      console.log('Motion:    ARROW KEYS or Vim-keys');
+      console.log('           space or . to rest one turn');
       console.log();
       console.log('Commands:');
       console.log();
-      console.log('(?)               help (this menu)');
-      console.log('(↓) or (<) or (j) descend stairs/retrieve amulet');
-      console.log('(q) or (p)        quaff potion');
-      console.log('(d)               debug mode toggle on/off');
-      console.log('(v)		     toggle vertical orientation on/off');
-      console.log('(Q)               Quit');
+      console.log('(?)        help (this menu)');
+      console.log('(<)        descend stairs/retrieve amulet');
+      console.log('(q) or (p) quaff potion');
+      console.log('(d)        debug mode toggle on/off');
+      console.log('(v         toggle horizontal/vertical orientation ');
+      console.log('(Q)        Quit');
   //USEFUL FOR DEBUGGING
   if (debugMode){
       console.log(key);
@@ -466,7 +469,6 @@ function drawScreen(){
 	//was set above
       } else if (playerX == index){
 	currentChar = '@';
-	  //if (poisoned){currentChar='$'}
 	} 
       else if (goldX == index){
         currentChar = '*';
@@ -483,8 +485,6 @@ function drawScreen(){
       }
         
       printdungeon+=currentChar;
-      //UNCOMMENT FOLLOWING LINE TO PRINT VERTICALLY
-      //console.log(currentChar);
     }
 
 //USEFUL IN DEBUGGING
