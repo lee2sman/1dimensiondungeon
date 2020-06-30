@@ -8,6 +8,7 @@
 const fs = require('fs');
 const chalk = require('chalk');
 
+let lastScore, highScore;
 let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
 let playerX = 0;
 let stairsX, goldX = 0, potionX = 0;
@@ -51,9 +52,10 @@ function start(){
 
   console.log('Welcome to One Dim Dungeon 1dimensional roguelike');
   console.log();
-  console.log('Last score:');
-  const lastHighScore = fs.readFileSync('.highscore.txt', 'utf8');
-  console.log(lastHighScore);
+  lastScore = fs.readFileSync('.lastscore.txt', 'utf8');
+  highScore = fs.readFileSync('.highscore.txt', 'utf8');
+  console.log('Last score: '+lastScore+' gold');
+  console.log('High score: '+highScore+' gold');
 
   resetDungeon();
 }
@@ -561,11 +563,19 @@ function end(){
 function printOutAndQuit(){
       console.log('You killed '+killed+' monsters and found '+gold+' gold.');
   //write to file
-  let score = 'Level: '+playerLevel+' Killed: '+killed+' Gold: '+gold;
-  fs.writeFileSync('.highscore.txt', score, (err) => {
+  let score = gold;
+  fs.writeFileSync('.lastscore.txt', score, (err) => {
     // throws an error, you could also catch it here
     if (err) throw err;
 });
+if (gold>highScore){
+  console.log('Congratulations, new high score! '+gold+' gold.');
+   fs.writeFileSync('.highscore.txt', score, (err) => {
+      // throws an error, you could also catch it here
+      if (err) throw err;
+  });
+}
+
       console.log();
       console.log('goodbye');
       process.exit();
