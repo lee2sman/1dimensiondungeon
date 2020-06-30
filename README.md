@@ -27,22 +27,24 @@ To launch with vertical orientation:
 
 ```node game.js --vertical``` OR ```node game.js -v```
 
+To launch game in flip-flop mode (orientation switches every level):
+
+```node game.js --flip-flop``` OR ```node game.js -f```
+
 ## Controls
 
-You can move with arrows or vim-keys.
-
 ```
-Motion: LEFT        REST       RIGHT
-
-        h OR ← | . OR (space) | r OR →
+Motion:    ARROW KEYS or Vim-keys
+           space or . to rest one turn
 
 Commands:
 
-(?) help (this menu)
-(↓) or (<) or (j) descend stairs/retrieve amulet
-(q) or (p)        quaff potion
-(d)               debug mode toggle on/off
-(Q)               Quit
+(?)        help (this menu)
+(<)        descend stairs/retrieve amulet
+(q) or (p) quaff potion
+(d)        debug mode toggle on/off
+(v         toggle horizontal/vertical orientation
+(Q)        Quit
 ```
 
 ## Goal
