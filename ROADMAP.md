@@ -4,7 +4,7 @@
 - [O] potions 
   - [X] teleport
   - [X] get sick ('You were poisoned' and decrease player hp)
-  - [ ] cloak of darkness - cannot see actual board, they are renderes as empty spaces - would need clock feature
+  - [ ] cloak of darkness - cannot see actual board, they are rendered as empty spaces - would need clock feature
   - [X] spawn a random enemy
   - [X] agitate monsters (increase their aggression)
   - [X] dissolving spell. fall through floor
@@ -22,6 +22,7 @@
   - [ ] simple clock timeout feature
 - [X] choose different font, use color (background and on font)
 - [ ] game also output graphically - tiles and/or also runs on web
+- [ ] pink poison spreading slime
 
 ### Further iterations
 
