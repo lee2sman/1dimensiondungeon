@@ -51,7 +51,7 @@ I hacked together the original (buggy) version in a day, then took a few days to
 
 Can also be modified to work in vertical orientation instead of horizontally.
 
-Read much more about it (and other 1-dimensional roguelikes and dungeon crawlers) on my Nosebook blog [here](http://leetusman.com/nosebook/one-dimensional-dungeons).
+**Read much more about it (and other 1-dimensional roguelikes and dungeon crawlers) on my Nosebook blog [here](http://leetusman.com/nosebook/one-dimensional-dungeons).**
 
 ## Roadmap
 
