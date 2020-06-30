@@ -6,13 +6,14 @@
 
 //globals
 const fs = require('fs');
+const chalk = require('chalk');
 
-let hp=4, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
+let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false;
 let playerX = 0;
-let stairsX, goldX = 0;
+let stairsX, goldX = 0, potionX = 0;
 let killed = 0;
 let lastMonster = '';
-let monsters = [], dungeon = [], dungeonStartLength=24;
+let monsters = [], dungeonStartLength=24;
 let monstersList = {'k':'kobold','j':'jackal','b':'bat','r':'rat','m':'monkey','l':'leprechaun','g':'goblin','f':'flick','e':'floating eyeball','h':'hobgoblin','o':'orc','s':'snake','T':'toad','v':'vampire','w':'werewolf','y':'yeti','a':'fire ant','c':'cockatrice','d':'hell dog','i':'ice demon','n':'wood nymph','p':'iron piercer','q':'quagga','t':'trapper','u':'black unicorn','x':'xorn','z':'elf zombie','A':'archon','B':'vampire bat','C':'centaur','D':'pink dragon','E':'air elemental','F':'animated fungus','G':'gnome king','H':'hill giant','I':'imp','J':'pink jelly','K':'Keystone Kop','L':'arch-lich','M':'mummy','N':'naga','O':'ogre','P':'black pudding','Q':'quacker','R':'rust monster','S':'cave spider','U':'ugly worm','V':'vampire','W':'ring wraith','X':'lil xan','Y':'yowler','Z':'zruty'};
 
 
@@ -21,8 +22,8 @@ class Monster {
    let char = 'kjbrmlgfehosTvwyacdinpqtuxzABCDEFGHIJKLMNOPQRSUVWXYZ';
   
    this.name = char.charAt(Math.floor(Math.random()*(playerLevel*2)));
-   this.hp = Math.ceil(Math.random()*hp);  //could instead do this based on what floor
-   this.attack = Math.ceil(Math.random()*(this.hp)); //attack is based on monster's hp
+   this.hp = Math.ceil(Math.random()*(hp/2)) + Math.round(playerLevel/2); 
+   this.attack = Math.ceil(Math.random()*(this.hp)); 
    this.aggression = Math.random();
 
 //choose x location
@@ -34,20 +35,19 @@ class Monster {
 	this.x = Math.ceil(Math.random()*(dungeon.length-1));
      } while (this.x == playerX)
    }
-
-   //put monster in dungeon in this position //IS THIS SUPPOSED TO BE HERE?
-    dungeon[this.x] = this.name;
  }
 }
 
-
+//-START GAME-
 start();
 main();
-
 
 function start(){
   //clear screen to start
     console.log('\033[2J');
+
+  checkDebugMode();
+  checkTerminal();
 
   console.log('Welcome to One Dim Dungeon 1dimensional roguelike');
   console.log();
@@ -65,33 +65,30 @@ function resetDungeon(){
   //
   dungeonStartLength = Math.ceil(Math.random()*20)+6; //dungeons are 6 - 26 in length
 
+  //superfluous?
   for (let i = 0; i < dungeonStartLength; i++){
     dungeon.push('.');
   }
 
   //spawn gold potentially, 25% chance
     if (Math.random()<0.25){
-       //spawn gold
        spawnGold();
     }
-
-  spawnStairs();
-
-  //spawn 2 monsters on edges
-  spawnMonster();
-  spawnMonster();
-  //place 1 monster somewhere
-  /*
-  do {
-     monsters[monsters.length-1].x = Math.ceil(Math.random()*(dungeon.length-2)
-
-  }
-  while (dungeon[monsters[monsters.length-1].x] == '.')
-  */
+  
+  //spawn potion, 20% chance
+    if (Math.random()<0.20){
+       spawnPotion();
+    }
 
   //place player
   playerX = Math.ceil(Math.random()*(dungeon.length-2))
-  dungeon[playerX] = '@';
+
+  spawnStairs();
+
+  //spawn 2 monsters 
+  spawnMonster();
+  spawnMonster();
+
 }
 
 
@@ -100,12 +97,6 @@ function spawnStairs(){
     stairsX = Math.ceil(Math.random()*(dungeon.length-2))
   }
   while (stairsX === playerX);
-
-  if (playerLevel < 16){
-    dungeon[stairsX] = '<';
-  } else {
-    dungeon[stairsX] = '%'; //spawn amulet, retrieve to leave!
-  }
 }
 
 function main(){
@@ -119,16 +110,6 @@ function main(){
 
     increaseHealth();
 
-    //redraw stairs
-    if (playerLevel < 16){
-      dungeon[stairsX]='<';
-    } else {
-      dungeon[stairsX]='%';
-    }
-
-    //redraw goldX?
-
-
     checkKeys(str, key, legitMove = false);
 
     moveMonsters(legitMove);
@@ -141,10 +122,7 @@ function main(){
       }
     }
     
-    checkHealth();
-
-    levelUp();
-
+    printStats();
     drawScreen();
 
     checkIfWon();
@@ -153,33 +131,40 @@ function main(){
   console.log('(?) for help');
 }
 
+function checkTerminal(){
+  if (process.stdout.columns<48){
+    console.log();
+    console.log('WARNING:');
+    console.log('1dim dungeon needs a min width of 48.');
+    console.log();
+  }
+}
+
 function checkKeys(str, key){
    if (key.ctrl && key.name === 'c') {
       end();
 
      //MOVE LEFT SECTION / IF you are not on left-most visible square
     } else if ((key.name === 'left' || key.name === 'h') && playerX > 1){
-          
-   moveLeft();      
-
+        legitMove = true;
+        moveLeft();      
       //MOVE RIGHT IF you are not on the most right visible space
     } else if ((key.name === 'right' || key.name === 'l') && playerX < dungeon.length-2){
-
+      legitMove = true;
       moveRight();
-
    } else if ((key.sequence === '.') || (key.name === 'space')){
 
           legitMove = true;
 
-    } else if (key.name === 'q' && potions > 0){
-
+    } else if ((key.name === 'q' && potions>0) || (key.name === 'p' && potions>0)){
+           usePotion();
     } else if (key.sequence === 'Q'){ //quit
       end();
     } else if (key.name === 'r'){
 
           legitMove = true;
 
-    } else if (key.name === 'down' || key.sequence === '<'){
+    } else if (key.name === 'down' || key.sequence === '<' || key.name === 'j'){
 
       if (playerX == stairsX){
         //add some hp when you descend
@@ -187,15 +172,8 @@ function checkKeys(str, key){
         //draw new floor
         resetDungeon();
       }
-    } else if (key.name === 'i'){
-       inventory();
     } else if (key.name === 'd'){
-      debugMode=!debugMode;
-      if (debugMode){
-        console.log('debug mode is on');
-      } else {
-        console.log('debug mode is off');
-      }
+        toggleDebugMode();
     } else if (key.sequence === '?'){
        help(str, key);
 
@@ -207,9 +185,24 @@ function checkKeys(str, key){
         }
 }
 
-function moveLeft(){
-        legitMove = true;
+function checkDebugMode(){
+    for (arg in process.argv){
+      if (process.argv[arg] == '-d' || process.argv[arg] == '--debug'){
+	toggleDebugMode();
+      }
+    }
+}
 
+function toggleDebugMode(){
+    debugMode=!debugMode;
+    if (debugMode){
+      console.log('Debug mode: ON');
+    } else {
+      console.log('Debug mode: OFF');
+    }
+}
+
+function moveLeft(){
           let monsterPresence = false;
 	  for (monster in monsters){
              if (monsters[monster].x == (playerX-1)){
@@ -218,28 +211,30 @@ function moveLeft(){
 	     }
 	  }
 
-        if (dungeon[playerX-1] == '*'){
+        if ((playerX-1)==goldX){ 
 	   tempGold = Math.ceil(Math.random()*(10*playerLevel));
 	   console.log('You found '+tempGold+' gold.');
 	  goldX=0;
 	   gold+=tempGold;
 	}
 
+        if ((playerX - 1) == potionX){
+	   potions++;
+	   potionX=0;
+	   console.log('You found a potion!');
+	}
 
-	if (!(monsterPresence)){ //no monster there
-	    dungeon[playerX] = '.';
+
+// NOT NEEDED ANYMORE
+	  if (!(monsterPresence)){ //no monster there
 	    if (playerX == stairsX){//check if there are stairs there and if so redraw them
-               dungeon[playerX] = '<';
 	    }
 	    playerX--;
-	    dungeon[playerX] = '@';
 	}
    
 }
 
 function moveRight(){
-          legitMove = true;
-
       let monsterPresence = false;
 	  for (monster in monsters){
              if (monsters[monster].x == (playerX+1)){
@@ -248,29 +243,22 @@ function moveRight(){
 	     }
 	  }
 
-        if (dungeon[playerX+1] == '*'){
+        if ((playerX + 1) == goldX){
 	   tempGold = Math.ceil(Math.random()*20);
 	   console.log('You found '+tempGold+' gold.');
 	  goldX=0;
 	   gold+=tempGold;
 	}
-
+        if ((playerX + 1) == potionX){
+	   potions++;
+	   console.log('You found a potion!');
+	}
 
 	if (!(monsterPresence)){ //no monster there
-          dungeon[playerX] = '.';
-	  if (playerX == stairsX){//check if there are stairs there and if so redraw them
-               dungeon[playerX] = '<';
-	  }
           playerX++;
-          dungeon[playerX] = '@';
 	}
 
 
-}
-
-function inventory(){
-  console.log('potions: '+potions+' scrolls: '+scrolls+' gold: '+gold);
-  console.log();
 }
 
 function help(str, key){
@@ -280,13 +268,11 @@ function help(str, key){
       console.log();
       console.log('Commands:');
       console.log();
-      console.log('(?) help (this menu)');
-      console.log('(↓) or (<) descend stairs/retrieve amulet)');
-      //console.log('(i) inventory');
-      //console.log('(q) quaff');
-      //console.log('(r) read scroll');
-      console.log('(d) debug mode toggle on/off');
-      console.log('(Q) Quit');
+      console.log('(?)               help (this menu)');
+      console.log('(↓) or (<) or (j) descend stairs/retrieve amulet');
+      console.log('(q) or (p)        quaff potion');
+      console.log('(d)               debug mode toggle on/off');
+      console.log('(Q)               Quit');
   //USEFUL FOR DEBUGGING
   if (debugMode){
       console.log(key);
@@ -298,7 +284,12 @@ function help(str, key){
 
 function spawnGold(){
   goldX = Math.floor(Math.random()*dungeon.length);
-  dungeon[goldX] = '*';
+}
+
+function spawnPotion(){
+  do {
+    potionX = Math.floor(Math.random()*dungeon.length);
+  } while ((potionX !== goldX) && (potionX !== playerX) && (potionX !== stairsX))
 }
 
 function increaseHealth(){
@@ -310,8 +301,45 @@ function increaseHealth(){
   }
 }
 
+function usePotion(){
+  if (potions>0){
+    potionX = 0;
+    potions--;
+
+    let result = Math.random();
+    if (result<0.2){
+      if (hp<(4*playerLevel)){ //can't increase life above a limit
+	console.log('You drink a potion of regeneration.');
+	hp+=Math.round(Math.random()*playerLevel);
+      }
+    } else if (result<0.4){//increase health, no limit! 6 is a magic number
+	console.log('You drink a health potion');
+	hp+=Math.round(Math.random()*(playerLevel/2)+6); 
+    } else if (result<0.6){
+       console.log('You were poisoned!');
+       hp-=Math.round(Math.random()*playerLevel);
+    } else if (result<0.8){
+      console.log('Dissolving dust. You fall through the floor');
+      resetDungeon();
+    } else {
+      console.log('Potion of summoning. You summon a demon.');
+      spawnMonster();
+    }
+  } else {
+    console.log('You have no potions!');
+  }
+}
+
 function spawnMonster(pos){
-      if ((dungeon[0].toLowerCase() == dungeon[0].toUpperCase()) || (dungeon[dungeon.length-1].toLowerCase() == dungeon[dungeon.length-1].toUpperCase()) && (dungeon[0] !== '@' || dungeon[dungeon.length-1] !== '@')) { //is there room for a monster to spawn on left or right?
+  let allowSpawn = true;
+  for (monster in monsters){
+    if ((monsters[monster].x == 0)||(monsters[monster].x == dungeon.length-1)){
+      allowSpawn = false;
+    }
+  }
+
+  if (allowSpawn){
+
 	//spawn monster
 	monster = new Monster(pos);
 	monsters.push(monster);
@@ -339,23 +367,13 @@ function moveMonsters(legitMove){
 		}
 	    }
 	      if (noMonsterAdjacent){//no monster to immediate right, move right
-		dungeon[monsters[monster].x] = '.';
-  
-		if (monsters[monster].x == stairsX){//check if there are stairs there and if so redraw them
-		     dungeon[monsters[monster].x] = '<';
-		}
-
 		monsters[monster].x++;
-		dungeon[monsters[monster].x] = monsters[monster].name;
 	      }
 	  } else if (monsters[monster].x == (playerX-1)){
             console.log('The '+monstersList[monsters[monster].name]+ ' hit you!');
-	    lastMonster=monsters[monster].name;
+	    lastMonster=monsters[monster].name; //save monster's for stats output
 	    //player loses some hp
 	    hp-=monsters[monster].attack;
-	    //console.log('player hp: '+hp);
-	    //monster loses some hp
-	    //hitMonster(monsters, monster);
 
 	  } else if (monsters[monster].x>(playerX+1)){ //if monster more than 1 space away to right of player
               
@@ -367,18 +385,7 @@ function moveMonsters(legitMove){
 		}
 
 	      if (noMonsterAdjacent){//no monster is to immediate left so move monster left
-		 dungeon[monsters[monster].x] = '.';
-
-		if (monsters[monster].x == goldX){//check if gold there and if so redraw 
-		     dungeon[monsters[monster].x] = '*';
-		}
-
-		if (monsters[monster].x == stairsX){//check if there are stairs there and if so redraw them
-		     dungeon[monsters[monster].x] = '<';
-		}
-
 		 monsters[monster].x--;
-		 dungeon[monsters[monster].x] = monsters[monster].name;
 	      }
 
 	  } else if (monsters[monster].x == playerX+1){
@@ -386,9 +393,6 @@ function moveMonsters(legitMove){
 	    lastMonster=monsters[monster].name;
 	    //player loses some hp
 	    hp-=monsters[monster].attack;
-	    //console.log('player hp: '+hp);
-	    //monster loses some hp
-	    //hitMonster(monsters, monster);
 	  }
 
       }
@@ -402,17 +406,6 @@ function hitMonster(monsters,monster){
     console.log('You hit the '+ monstersList[monsters[monster].name]);
 
 	    if (monsters[monster].hp<=0){
-	      dungeon[monsters[monster].x] = '.';
-
-	      //redraw gold if that was in the same position
-	      if (dungeon[monsters[monster].x] == goldX){
-	        dungeon[monsters[monster].x] = '*';
-	      }
-
-	      //redraw stairs if that was in the same position
-	      if (dungeon[monsters[monster].x] == stairsX){
-	        dungeon[monsters[monster].x] = '<';
-	      }
 
 	      killed++;
 	      console.log('You killed the '+monstersList[monsters[monster].name]+'!');
@@ -423,58 +416,95 @@ function hitMonster(monsters,monster){
 
 function drawScreen(){
 
+    console.log();
+
     //DRAW SCREEN
+    let printdungeon = '';
 
-    var printdungeon = ''
-
-    //for (var index in dungeon){ //loop through all spaces
     for (let index = 1; index < dungeon.length - 1; index++){ //loop through all spaces except 0th and last (so player can't see ends)
 
-      if (dungeon[index] == '.'){ //there's nothing there
-	  printdungeon+='.'; //so add a dot
-      } 
+      //BUILD UP THE DUNGEON STRING
+      let currentChar = '';
 
-      if (dungeon[index] == '*'){
-          printdungeon+='*';
-      }
-
-      if (dungeon[index] == '<'){
-          printdungeon+='<';
-      }
-      if (dungeon[index] == '%'){
-          printdungeon+='%';
-      }
-
-      for (var monster in monsters){ //loop through monsters in array
-            if (monsters[monster].x == index){ //if monster is at that position
-               printdungeon+=monsters[monster].name; //add it there
-	    }
+      let monsterPresent = false;
+      for (monster in monsters){
+         if (monsters[monster].x == index){
+	    monsterPresent = true;
+            currentChar = monsters[monster].name;
+	   //DEBUG
+	      if (debugMode){
+		console.log(monsters[monster].name +': '+index);
+	      }
+	 }
       }
 
-      if (playerX == index){
-	if (hp>0){
-	  printdungeon+='@';
-	} else {
-          printdungeon+='⚰️';
-	}
+      if (monsterPresent){
+	//was set above
+      } else if (playerX == index){
+	currentChar = '@';
+	  //if (poisoned){currentChar='$'}
+	} 
+      else if (goldX == index){
+        currentChar = '*';
+      } else if (potionX == index){
+        currentChar = '!';
+      } else if (stairsX == index){
+	  if (playerLevel>15){
+	    currentChar = '%'; //on last level
+	  } else {
+	    currentChar = '<';
+	  }
+      }  else {  //otherwise, nothing's there
+        currentChar = '.';
       }
+        
+      printdungeon+=currentChar;
+      //UNCOMMENT FOLLOWING LINE TO PRINT VERTICALLY
+      //console.log(currentChar);
     }
 
-    //print it out
-  //USEFUL IN DEBUGGING
+//USEFUL IN DEBUGGING
     //console.log(dungeon);
-    
-    //print floor
-    console.log('gold: '+gold);
-    console.log()
 
-    console.log(printdungeon);
- 
+       //DEBUG
+	  if (debugMode){
+	    console.log('playerX: '+playerX);
+	    console.log('goldX: '+goldX);
+	    console.log('potionX: '+potionX);
+	    console.log('stairsX: '+stairsX);
+	  }
+
+    console.log()
+   //console.log('dungeon.length: '+dungeon.length);
+    let castlewall='#';
+    for (let i = 0; i < (dungeon.length-1); i++){
+       castlewall+='#'
+    }
+   // console.log(chalk.red('Hello', chalk.underline.bgBlue('world') + '!'));
+  //  console.log(chalk.green.bgBlue.bold('Hello world!'));
+
+    console.log(chalk.green.bgBlue.bold(castlewall));
+    console.log(chalk.cyan.bgBlue.bold('[')+chalk.gray.bgMagenta(printdungeon)+chalk.green.bgBlue.bold(']'));
+    console.log(chalk.green.bgBlue.bold(castlewall));
+}
+
+function printStats(){
+  levelUp();
+  checkGold();
+  checkPotions();
+  checkHealth();
 }
 
 function levelUp(){
   console.log('level: '+playerLevel);
-   //playerLevel = Math.floor(killed/7+1);
+}
+
+function checkPotions(){
+  console.log('potions: '+potions);
+}
+
+function checkGold(){
+  console.log('gold: '+gold);
 }
 
 function checkHealth(){
@@ -524,7 +554,6 @@ function end(){
 function printOutAndQuit(){
       console.log('You killed '+killed+' monsters and found '+gold+' gold.');
   //write to file
-  //
   let score = 'Level: '+playerLevel+' Killed: '+killed+' Gold: '+gold;
   fs.writeFileSync('.highscore.txt', score, (err) => {
     // throws an error, you could also catch it here
@@ -533,5 +562,4 @@ function printOutAndQuit(){
       console.log();
       console.log('goodbye');
       process.exit();
-
 }
