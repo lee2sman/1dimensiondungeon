@@ -8,7 +8,10 @@
   - [X] spawn a random enemy
   - [X] agitate monsters (increase their aggression)
   - [X] dissolving spell. fall through floor
-- [ ] monsters have specific attack ranges set when monster is spawned rather than random attack points (xp?) each time it hits. This will allow that 'oh no!' feeling to occur when the player sees a particularly nasty enemy rather than have fighting outcome feel more randomized.
+- [ ] implement monster dictionary (json) so they have preset character differences
+  - [ ] monsters have specified attack ```xp``` and ```hp``` set at spawn rather than randomly rolled each time it hits. This will allow that 'oh no!' feeling to occur when the player sees a particularly nasty enemy rather than have fighting outcome feel more randomized
+  - [ ] monsters have specific colors
+  - [ ] monsters could have an added script with special ability that is run each time they move (and if adjacent to player)
 
 ## Added
 - [X] stairs
@@ -17,12 +20,14 @@
 ## Under consideration
 - [ ] scrolls? or maybe that's too much
 - [X] better core mechanics
-- [ ] add varied terrain? locked doors with keys on other side of level?
+- [ ] number of monsters spawned on dungeonreset tied to level so difficulty increases? (something like + ceil(level/4))
+- [ ] add varied terrain? (implement with bgColor or different char: .,;
+- [ ] locked doors with keys on other side of level? 
 - [ ] varied enemy behaviors including attacks, 'hallucination' (like toads in Brogue) - would need clock feature, generating minions, freezing, etc
   - [ ] simple clock timeout feature
 - [X] choose different font, use color (background and on font)
 - [ ] game also output graphically - tiles and/or also runs on web
-- [ ] pink poison spreading slime
+- [ ] pink poison slime (or gelatinous cube) - you can stand on it (like potion or gold) but it reduces hp - potentially it expands
 
 ### Further iterations
 
