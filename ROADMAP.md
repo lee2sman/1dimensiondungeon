@@ -16,6 +16,7 @@
 ## Added
 - [X] stairs
 - [X] scrolling!  (note: currently eliminated when concept of stairs was added. see earlier git tag 'dungeon-scrolling' for previous sample code)
+- [X] vertical orientation option
 
 ## Under consideration
 - [ ] scrolls? or maybe that's too much
