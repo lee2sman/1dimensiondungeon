@@ -255,6 +255,7 @@ function moveRight(){
 	}
         if ((playerX + 1) == potionX){
 	   potions++;
+	   potionX=0;
 	   console.log('You found a potion!');
 	}
 
