@@ -9,7 +9,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 let lastScore, highScore;
-let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false, vertical = false, flipflop = false;
+let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false, vertical = false, flipflop = false, blind = false, blindness = 5;
 let playerX = 0;
 let stairsX, goldX = 0, potionX = 0;
 let killed = 0;
@@ -85,15 +85,18 @@ function resetDungeon(){
        spawnGold();
     }
   
-  //spawn potion, 20% chance
-    if (Math.random()<0.20){
+  //spawn potion, 30% chance
+    if (Math.random()<0.30){
        spawnPotion();
     }
 
-  //spawn 2 monsters 
+  //spawn monsters 
   spawnMonster();
   spawnMonster();
   spawnMonster();
+  if (dungeonStartLength>16){ //then spawn another
+    spawnMonster();     
+  }
 
 }
 
@@ -127,7 +130,9 @@ function main(){
         spawnMonster(dungeon.length-1);
       }
     }
-    
+
+    checkBlindness();
+
     printStats();
     drawScreen();
 
@@ -240,11 +245,7 @@ function moveLeft(){
 	   console.log('You found a potion!');
 	}
 
-
-// NOT NEEDED ANYMORE
 	  if (!(monsterPresence)){ //no monster there
-	    if (playerX == stairsX){//check if there are stairs there and if so redraw them
-	    }
 	    playerX--;
 	}
    
@@ -335,27 +336,41 @@ function usePotion(){
 
     let result = Math.random();
     if (result<0.2){
-      if (hp<(4*playerLevel)){ //can't increase life above a limit
+      if (hp<(4*playerLevel)){ //can't increase life above a limit //GOOD
 	console.log('You drink a potion of regeneration.');
 	hp+=Math.round(Math.random()*playerLevel);
       }
-    } else if (result<0.4){//increase health, no limit! 6 is a magic number
-	console.log('You drink a health potion');
+    } else if (result<0.3){ //BAD
+      console.log('A cloak of darkness temporarily blinds you'); 
+      blind = true;
+      blindness = Math.ceil(Math.random()*6+2); //3 to 8 turns
+    } else if (result<0.5){//increase health, no limit! 6 is a magic number
+	console.log('You drink a health potion'); //GOOD
 	hp+=Math.round(Math.random()*(playerLevel/2)+6); 
     } else if (result<0.6){
        console.log('You were poisoned!');
        hp-=Math.round(Math.random()*playerLevel);
     } else if (result<0.8){
-      console.log('Dissolving dust. You fall through the floor. Ooof.');
+      console.log('Dissolving dust. You fall through the floor. Ooof.'); //OK
        hp-=Math.round(playerLevel/3);
       resetDungeon();
+    } else if (result<0.9){ //GOOD
+      console.log('You cast a potion of luck');
+      gold+=Math.ceil(Math.random()*playerLevel+10);
     } else {
-      console.log('Potion of summoning. You summon a demon.');
+      console.log('Potion of summoning. You summon a demon.'); //BAD
       spawnMonster();
     }
   } else {
     console.log('You have no potions!');
   }
+}
+
+function checkBlindness(){
+  if (blind){
+    blindness--;
+  }
+  if (blindness<=0)(blind=false)
 }
 
 function spawnMonster(pos){
@@ -484,7 +499,9 @@ function drawScreen(){
       }  else {  //otherwise, nothing's there
         currentChar = '.';
       }
-        
+      
+      if (blind&&!(index==playerX)){currentChar = ' ';} 
+
       printdungeon+=currentChar;
     }
 
@@ -505,18 +522,32 @@ function drawScreen(){
     for (let i = 0; i < (dungeon.length-1); i++){
        castlewall+='#'
     }
+    if (vertical){
+      if (!blind){
+	console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
+	  for (let i = 0; i < dungeon.length-2; i++){
+	   console.log(chalk.green.bgBlue.bold('#')+chalk.gray.bgMagenta(Array.from(printdungeon)[i])+chalk.green.bgBlue.bold('#'));
+	  }
+	console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
+      } else { //you're blind! antipattern!
+	console.log();
+	  for (let i = 0; i < dungeon.length-2; i++){
+	    console.log(' '+printdungeon[i]+' ');
+	  }
+	console.log();
+      }
+    } else { //horizontal
+        if (!blind){
+	  console.log(chalk.green.bgBlue.bold(castlewall));
+	  console.log(chalk.cyan.bgBlue.bold('[')+chalk.gray.bgMagenta(printdungeon)+chalk.green.bgBlue.bold(']'));
+	  console.log(chalk.green.bgBlue.bold(castlewall));
+	}  else { //you're blind! antipattern!
+	   console.log();
+	   console.log(printdungeon);
+	   console.log();
+        }
 
-  if (vertical){
-    console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
-    for (let i = 0; i < dungeon.length-2; i++){
-     console.log(chalk.green.bgBlue.bold('#')+chalk.gray.bgMagenta(Array.from(printdungeon)[i])+chalk.green.bgBlue.bold('#'));
-    }
-    console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
-  } else { //horizontal
-    console.log(chalk.green.bgBlue.bold(castlewall));
-    console.log(chalk.cyan.bgBlue.bold('[')+chalk.gray.bgMagenta(printdungeon)+chalk.green.bgBlue.bold(']'));
-    console.log(chalk.green.bgBlue.bold(castlewall));
-  }
+      }
 }
 
 function printStats(){

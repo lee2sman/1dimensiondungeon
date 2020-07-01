@@ -1,10 +1,10 @@
 # Roadmap
 
 ## To implement
-- [O] potions 
+- [X] potions 
   - [X] teleport
   - [X] get sick ('You were poisoned' and decrease player hp)
-  - [ ] cloak of darkness - cannot see actual board, they are rendered as empty spaces - would need clock feature
+  - [X] cloak of darkness - cannot see actual board, they are rendered as empty spaces - would need clock feature
   - [X] spawn a random enemy
   - [X] agitate monsters (increase their aggression)
   - [X] dissolving spell. fall through floor
