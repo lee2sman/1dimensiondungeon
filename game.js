@@ -51,6 +51,7 @@ function start(){
   checkTerminal();
 
   console.log('Welcome to One Dim Dungeon 1dimensional roguelike');
+  console.log('Version 0.1.1');
   console.log();
   lastScore = fs.readFileSync('.lastscore.txt', 'utf8');
   highScore = fs.readFileSync('.highscore.txt', 'utf8');
@@ -202,9 +203,6 @@ function checkFlags(){
       if (process.argv[arg] == '-f' || process.argv[arg] == '--flip-flop'){
 	flipflop = true;
 	console.log('Flip-flop orientation mode');
-      }
-      if (process.argv[arg] == '--version'){
-	console.log('Version 0.1.1');
       }
     }
 }

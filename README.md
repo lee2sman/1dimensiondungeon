@@ -31,10 +31,6 @@ To launch game in flip-flop mode (orientation switches every level):
 
 ```node game.js --flip-flop``` OR ```node game.js -f```
 
-To see version #:
-
-```node game.js --version```
-
 ## Controls
 
 ```
