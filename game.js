@@ -201,6 +201,10 @@ function checkFlags(){
       }
       if (process.argv[arg] == '-f' || process.argv[arg] == '--flip-flop'){
 	flipflop = true;
+	console.log('Flip-flop orientation mode');
+      }
+      if (process.argv[arg] == '--version'){
+	console.log('Version 0.1.1');
       }
     }
 }
