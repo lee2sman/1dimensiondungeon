@@ -346,7 +346,8 @@ function usePotion(){
        console.log('You were poisoned!');
        hp-=Math.round(Math.random()*playerLevel);
     } else if (result<0.8){
-      console.log('Dissolving dust. You fall through the floor');
+      console.log('Dissolving dust. You fall through the floor. Ooof.');
+       hp-=Math.round(playerLevel/3);
       resetDungeon();
     } else {
       console.log('Potion of summoning. You summon a demon.');
