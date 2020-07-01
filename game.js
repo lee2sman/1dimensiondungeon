@@ -580,7 +580,7 @@ function checkIfWon(){
   if (playerLevel>16){
     console.log('\033[2J');
     console.log('Congratulations on your success braving the Dim Dungeon!');
-    console.log('You are one of the very few adventures to make it out alive!');
+    console.log('You are one of the very few adventurers to make it out alive!');
     console.log('Your name will be forever written into the history books!');
     printOutAndQuit();  
   }

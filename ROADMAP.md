@@ -21,7 +21,7 @@
 ## Under consideration
 - [ ] scrolls? or maybe that's too much
 - [X] better core mechanics
-- [ ] number of monsters spawned on dungeonreset tied to level so difficulty increases? (something like + ceil(level/4))
+- [X] number of monsters spawned on dungeonreset tied to level so difficulty increases? (something like + ceil(level/4))
 - [ ] add varied terrain? (implement with bgColor or different char: .,;
 - [ ] locked doors with keys on other side of level? 
 - [ ] varied enemy behaviors including attacks, 'hallucination' (like toads in Brogue) - would need clock feature, generating minions, freezing, etc
