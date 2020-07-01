@@ -51,6 +51,21 @@ Commands:
 
 Collect gold. Descend 16 levels through the dungeon and retrieve the amulet of Yendor. Avoid getting killed.
 
+## Potions
+
+#### Good 
+- Regeneration 
+- Health potion
+- Potion of luck
+
+#### Bad 
+- Cloak of darkness 
+- Poison
+- Summon demon
+
+#### Who knows?
+- Dissolving dust
+
 ## About 
 
 I hacked together the original (buggy) version in a day, then took a few days to add features, refactor, and track down annoying bugs. There may still be more!
