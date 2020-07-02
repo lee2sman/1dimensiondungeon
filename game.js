@@ -86,8 +86,8 @@ function resetDungeon(){
        spawnGold();
     }
   
-  //spawn potion, 30% chance
-    if (Math.random()<0.30){
+  //spawn potion, 23% chance
+    if (Math.random()<0.23){
        spawnPotion();
     }
 
@@ -319,7 +319,7 @@ function spawnGold(){
 function spawnPotion(){
   do {
     potionX = Math.floor(Math.random()*dungeon.length);
-  } while ((potionX == goldX) && (potionX == playerX) && (potionX == stairsX))
+  } while ((potionX == goldX) || (potionX == playerX) || (potionX == stairsX))
 }
 
 function increaseHealth(){
