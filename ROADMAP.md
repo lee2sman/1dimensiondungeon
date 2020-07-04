@@ -1,7 +1,6 @@
 # Roadmap
 
 ## To implement
-  - [ ] special monsters abilities
 
 ## Added
 - [X] stairs
@@ -13,10 +12,11 @@
   - [X] spawn a random enemy
   - [X] agitate monsters (increase their aggression)
   - [X] dissolving spell. fall through floor
-- [o] implement monster dictionary (json) so they have preset character differences
-  - [X] monsters have specified attack ```xp``` and ```hp``` set at spawn rather than randomly rolled each time it hits. This will allow that 'oh no!' feeling to occur when the player sees a particularly nasty enemy rather than have fighting outcome feel more randomized
+- [X] implement monster dictionary (json) so they have preset character differences
+  - [X] special monsters abilities
+  - [X] monsters have specified attack and ```hp``` set at spawn rather than randomly rolled 
   - [X] monsters have specific colors
- [X] vertical orientation option
+- [X] vertical orientation option
 
 ## Under consideration
 - [ ] scrolls? or maybe that's too much
