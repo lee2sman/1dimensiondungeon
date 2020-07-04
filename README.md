@@ -65,6 +65,7 @@ Collect gold. Descend 16 levels through the dungeon and retrieve the amulet of Y
 
 #### Who knows?
 - Dissolving dust
+- Hallucination
 
 ## About 
 
@@ -74,9 +75,11 @@ You can now also change the orientation!
 
 **Read much more about it (and other 1-dimensional roguelikes and dungeon crawlers) on my Nosebook blog [here](http://leetusman.com/nosebook/one-dimensional-dungeons).**
 
-## Roadmap
+## Bugs
 
-Yes, I have ideas on further ways to expand gameplay!
+Have ideas or thoughts on bugs or portability or mechanics? File an issue or get in touch on [twitter](https://twitter.com/2sman2sman). 
+
+## Roadmap
 
 See [ROADMAP](ROADMAP.md)
 
