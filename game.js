@@ -15,17 +15,236 @@ let stairsX, goldX = 0, potionX = 0;
 let killed = 0;
 let lastMonster = '';
 let monsters = [], dungeonStartLength=24;
-let monstersList = {'k':'kobold','j':'jackal','b':'bat','r':'rat','m':'monkey','l':'leprechaun','g':'goblin','f':'flick','e':'floating eyeball','h':'hobgoblin','o':'orc','s':'snake','T':'toad','v':'vampire','w':'werewolf','y':'yeti','a':'fire ant','c':'cockatrice','d':'hell dog','i':'ice demon','n':'wood nymph','p':'iron piercer','q':'quagga','t':'trapper','u':'black unicorn','x':'xorn','z':'elf zombie','A':'archon','B':'vampire bat','C':'centaur','D':'pink dragon','E':'air elemental','F':'animated fungus','G':'gnome king','H':'hill giant','I':'imp','J':'pink jelly','K':'Keystone Kop','L':'arch-lich','M':'mummy','N':'naga','O':'ogre','P':'black pudding','Q':'quacker','R':'rust monster','S':'cave spider','U':'ugly worm','V':'vampire','W':'ring wraith','X':'lil xan','Y':'yowler','Z':'zruty'};
+let monstersList = {
+  "monsters": [
+    {
+      "name":"jackal",
+      "char":"j",
+      "hp": 2,
+      "aggression": 0.55,
+      "attack": 2,
+      "minLevel": 0,
+      "color": "black",
+      "code": ""
+    }, 
+    {
+      "name":"kobold",
+      "char":"k",
+      "hp": 3,
+      "aggression": 0.70,
+      "attack": 2,
+      "minLevel": 0,
+      "color": "black",
+      "code": ""
+    }, 
+    {
+      "name":"bat",
+      "char":"b",
+      "hp":1,
+      "aggression":0.35,
+      "attack":1,
+      "minLevel": 0,
+      "color":"black",
+      "code":"//move somewhere else randomly in level"
+    },
+    {
+      "name":"rat",
+      "char":"r",
+      "hp":3,
+      "aggression":0.85,
+      "attack":2,
+      "minLevel": 1,
+      "color":"grey",
+      "code":""
+    },
+    {
+      "name":"monkey",
+      "char":"m",
+      "hp":2,
+      "aggression":0.25,
+      "attack":2,
+      "minLevel": 2,
+      "color":"black",
+      "code":""
+    },
+    {
+      "name":"snake",
+      "char":"s",
+      "hp":4,
+      "aggression":0.75,
+      "attack":3,
+      "minLevel": 2,
+      "color":"black",
+      "code":""
+    },
+    {
+      "name":"hobgoblin",
+      "char":"H",
+      "hp":7,
+      "aggression":0.82,
+      "attack":4,
+      "minLevel": 3,
+      "color":"magenta",
+      "code":""
+    },
+    {
+      "name":"cockatrice",
+      "char":"c",
+      "hp":6,
+      "aggression":0.72,
+      "attack":4,
+      "minLevel": 3,
+      "color":"black",
+      "code":""
+    },
+    {
+      "name":"toad",
+      "char":"t",
+      "hp":3,
+      "aggression":0.7,
+      "attack":3,
+      "minLevel": 4,
+      "color":"green",
+      "code":"//make player hallucinate"
+    },
+    {
+      "name":"hell dog",
+      "char":"d",
+      "hp":4,
+      "aggression":0.72,
+      "attack":7,
+      "minLevel": 4,
+      "color":"red",
+      "code":""
+    },
+    {
+      "name":"orc",
+      "char":"o",
+      "hp":8,
+      "aggression":0.72,
+      "attack":2,
+      "minLevel": 5,
+      "color":"cyan",
+      "code":""
+    },
+    {
+      "name":"quagga",
+      "char":"q",
+      "hp":5,
+      "aggression":0.72,
+      "attack":3,
+      "minLevel": 6,
+      "color":"black",
+      "code":""
+    },
+    {
+      "name":"archon",
+      "char":"a",
+      "hp":8,
+      "aggression":0.55,
+      "attack":7,
+      "minLevel": 7,
+      "color":"yellow",
+      "code":""
+    },
+
+    {
+      "name":"yeti",
+      "char":"y",
+      "hp":8,
+      "aggression":0.5,
+      "attack":5,
+      "minLevel": 7,
+      "color":"white",
+      "code":""
+    },
+    {
+      "name":"vampire",
+      "char":"y",
+      "hp":10,
+      "aggression":0.85,
+      "attack":12,
+      "minLevel": 10,
+      "color":"red",
+      "code":""
+    },
+    {
+      "name":"floating eyeball",
+      "char":"e",
+      "hp":10,
+      "aggression":0.45,
+      "attack":12,
+      "minLevel": 9,
+      "color":"blue",
+      "code":""
+    },
+    {
+      "name":"centaur",
+      "char":"C",
+      "hp":12,
+      "aggression":0.90,
+      "attack":14,
+      "minLevel": 10,
+      "color":"yellow",
+      "code":""
+    },
+    {
+      "name":"naga",
+      "char":"N",
+      "hp":12,
+      "aggression":0.90,
+      "attack":14,
+      "minLevel": 11,
+      "color":"cyan",
+      "code":""
+    },
+    {
+      "name":"xorn",
+      "char":"x",
+      "hp":19,
+      "aggression":0.80,
+      "attack":17,
+      "minLevel": 12,
+      "color":"magenta",
+      "code":""
+    },
+    {
+      "name":"arch lich",
+      "char":"L",
+      "hp":21,
+      "aggression":0.65,
+      "attack":20,
+      "minLevel": 13,
+      "color":"white",
+      "code":""
+    },
+    {
+      "name":"dragon",
+      "char":"D",
+      "hp":24,
+      "aggression":0.75,
+      "attack":21,
+      "minLevel": 13,
+      "color":"yellow",
+      "code":""
+    }
+  ]
+}
 
 
 class Monster {
  constructor(pos=null) {
-   let char = 'kjbrmlgfehosTvwyacdinpqtuxzABCDEFGHIJKLMNOPQRSUVWXYZ';
-  
-   this.name = char.charAt(Math.floor(Math.random()*(playerLevel*2)));
-   this.hp = Math.ceil(Math.random()*(hp/2)) + Math.round(playerLevel/2); 
-   this.attack = Math.ceil(Math.random()*(this.hp)); 
-   this.aggression = Math.random();
+   let _monster;
+
+   do {
+     _monster 	= Math.floor(Math.random()*monstersList.monsters.length)
+   } while (monstersList.monsters[_monster].minLevel > playerLevel) //spawns monster of appropriate strength
+
+   this.char       = monstersList.monsters[_monster].char;
+   this.name       = monstersList.monsters[_monster].name;
+   this.hp    	   = monstersList.monsters[_monster].hp;
+   this.attack	   = monstersList.monsters[_monster].attack;
+   this.aggression = monstersList.monsters[_monster].aggression;
 
 //choose x location
    if (pos !== null){
@@ -42,6 +261,17 @@ class Monster {
 //-START GAME-
 start();
 main();
+//COLOR TESTS
+//let tempC = chalk.keyword(monstersList.monsters[0].color);
+//console.log(tempC(monstersList.monsters[0].name +' is char '+monstersList.monsters[0].char));
+/*
+for (let i = 0; i < monstersList.monsters.length; i++){
+
+    let tempC = chalk.keyword(monstersList.monsters[i].color);
+
+    console.log(tempC(monstersList.monsters[i].char+' is a '+monstersList.monsters[i].hp+'hp '+monstersList.monsters[i].name+' that attacks for '+monstersList.monsters[i].attack+' and is '+monstersList.monsters[i].aggression));
+}
+*/
 
 function start(){
   //clear screen to start
@@ -92,9 +322,22 @@ function resetDungeon(){
     }
 
   //spawn monsters 
-  spawnMonster();
-  spawnMonster();
-  spawnMonster();
+  /*
+  if (playerLevel<02){
+    spawnMonster();
+    spawnMonster();
+  } else if (playerLevel<8){
+    spawnMonster();
+    spawnMonster();
+    spawnMonster();
+  } else {
+
+  }
+*/
+  for (let i = 0; i < playerLevel; i+=2){
+    spawnMonster();
+  }
+
   if (dungeonStartLength>16){ //then spawn another
     spawnMonster();     
   }
@@ -183,7 +426,6 @@ function checkKeys(str, key){
         toggleOrientation();
     } else if (key.sequence === '?'){
        help(str, key);
-
     } else {
       //
       console.log('not a command');
@@ -352,7 +594,7 @@ function usePotion(){
     } else if (result<0.6){
        console.log('You were poisoned!');
        hp-=Math.round(Math.random()*playerLevel);
-    } else if (result<0.8){
+    } else if ((result<0.8)&&(playerLevel<16)){ //can't fall through final floor
       console.log('Dissolving dust. You fall through the floor. Ooof.'); //OK
        hp-=Math.round(playerLevel/3);
       resetDungeon();
@@ -415,8 +657,8 @@ function moveMonsters(legitMove){
 		monsters[monster].x++;
 	      }
 	  } else if (monsters[monster].x == (playerX-1)){
-            console.log('The '+monstersList[monsters[monster].name]+ ' hit you!');
-	    lastMonster=monsters[monster].name; //save monster's for stats output
+	    lastMonster=monsters[monster].name; //save monster's name for stats output
+            console.log('The '+lastMonster+ ' hit you!');
 	    //player loses some hp
 	    hp-=monsters[monster].attack;
 
@@ -434,26 +676,25 @@ function moveMonsters(legitMove){
 	      }
 
 	  } else if (monsters[monster].x == playerX+1){
-            console.log('The '+monstersList[monsters[monster].name]+ ' hit you!');
+            //console.log('The '+monsters[monster].name+ ' hit you!');
 	    lastMonster=monsters[monster].name;
+            console.log('The '+lastMonster+ ' hit you!');
 	    //player loses some hp
 	    hp-=monsters[monster].attack;
 	  }
-
       }
-
     }
   }
 }
 
 function hitMonster(monsters,monster){
     monsters[monster].hp-=playerLevel;
-    console.log('You hit the '+ monstersList[monsters[monster].name]);
+    console.log('You hit the '+ monsters[monster].name);
 
 	    if (monsters[monster].hp<=0){
 
 	      killed++;
-	      console.log('You killed the '+monstersList[monsters[monster].name]+'!');
+	      console.log('You killed the '+monsters[monster].name+'!');
 	      //remove monster
               monsters.splice(monster, 1);
 	    }
@@ -475,10 +716,10 @@ function drawScreen(){
       for (monster in monsters){
          if (monsters[monster].x == index){
 	    monsterPresent = true;
-            currentChar = monsters[monster].name;
+            currentChar = monsters[monster].char;
 	   //DEBUG
 	      if (debugMode){
-		console.log(monsters[monster].name +': '+index);
+		console.log(monsters[monster].char+' on index: '+index);
 	      }
 	 }
       }
@@ -611,7 +852,7 @@ function end(){
    \\))ejm97/.,(//,,..,,\\||(,wo,\\ ).((//
                              -  \\)`);
       console.log('You died!');
-      console.log('You were killed by a '+monstersList[lastMonster]+' on level '+playerLevel);
+      console.log('You were killed by a '+lastMonster+' on level '+playerLevel);
       printOutAndQuit();
 }
 
