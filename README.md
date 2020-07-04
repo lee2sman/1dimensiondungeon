@@ -2,7 +2,7 @@
 
 by lee2sman 2020
 
-![1 dim dungeon](1dimdungeon.gif)  
+![1 dim dungeon](gameplay.gif)  
 
 ### Dependencies
 
