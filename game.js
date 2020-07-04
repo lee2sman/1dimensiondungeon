@@ -284,7 +284,7 @@ function start(){
   checkTerminal();
 
   console.log('Welcome to One Dim Dungeon 1dimensional roguelike');
-  console.log('Version 0.1.2');
+  console.log('Version 0.2');
   console.log();
   lastScore = fs.readFileSync('.lastscore.txt', 'utf8');
   highScore = fs.readFileSync('.highscore.txt', 'utf8');
