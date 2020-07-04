@@ -1,6 +1,7 @@
 # Roadmap
 
 ## To implement
+- None currently. Accomplished all my goals. Likely only further work would be refactoring of code and balancing mechanics of monsters. 
 
 ## Added
 - [X] stairs
@@ -17,16 +18,13 @@
   - [X] monsters have specified attack and ```hp``` set at spawn rather than randomly rolled 
   - [X] monsters have specific colors
 - [X] vertical orientation option
-
-## Under consideration
-- [ ] scrolls? or maybe that's too much
 - [X] better core mechanics
 - [X] number of monsters spawned on dungeonreset tied to level so difficulty increases? (something like + ceil(level/4))
-- [ ] add varied terrain? (implement with bgColor or different char: .,;
-- [ ] locked doors with keys on other side of level? 
-- [ ] varied enemy behaviors including attacks, 'hallucination' (like toads in Brogue) - would need clock feature, generating minions, freezing, etc
-  - [ ] simple clock timeout feature
+- [X] varied enemy behaviors including attacks, 'hallucination' (like toads in Brogue) - would need clock feature, generating minions, freezing, etc
+  - [X] simple clock timeout feature
 - [X] choose different font, use color (background and on font)
+
+## Under consideration
 - [ ] game also output graphically - tiles and/or also runs on web
 - [ ] pink poison slime (or gelatinous cube) - you can stand on it (like potion or gold) but it reduces hp - potentially it expands
 
@@ -34,3 +32,4 @@
 
 I think I may later use this as a basis of creating a walking game with generative conversations with characters the player comes across instead of or in addition to the hack and slash approach...
 
+Also currently planning a hardware port using a fork of this codebase.
