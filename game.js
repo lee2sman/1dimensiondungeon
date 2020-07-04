@@ -9,7 +9,7 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 let lastScore, highScore;
-let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false, vertical = false, flipflop = false, blind = false, blindness = 5;
+let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false, vertical = false, flipflop = false, blind = false, blindness = 5, hallucinate = false;
 let playerX = 0;
 let stairsX, goldX = 0, potionX = 0;
 let killed = 0;
@@ -45,7 +45,8 @@ let monstersList = {
       "attack":1,
       "minLevel": 0,
       "color":"white",
-      "code":"//move somewhere else randomly in level"
+      "code":"console.log('the bat picked you up and dropped you!');playerX = Math.ceil(Math.random()*(dungeon.length-2))"
+      //move somewhere else randomly in level, doesn't check for collision, probably should be fixed"
     },
     {
       "name":"rat",
@@ -55,7 +56,7 @@ let monstersList = {
       "attack":2,
       "minLevel": 1,
       "color":"grey",
-      "code":""
+      "code":"if(potions>0){console.log('the rat stole a potion!');potions--}"
     },
     {
       "name":"monkey",
@@ -65,7 +66,7 @@ let monstersList = {
       "attack":2,
       "minLevel": 2,
       "color":"white",
-      "code":""
+      "code":"if(gold>0){console.log('the monkey stole some gold');gold-=(Math.ceil(Math.random()))}"
     },
     {
       "name":"snake",
@@ -75,7 +76,7 @@ let monstersList = {
       "attack":3,
       "minLevel": 2,
       "color":"white",
-      "code":""
+      "code":"console.log('ssssssssssssss')"
     },
     {
       "name":"hobgoblin",
@@ -105,7 +106,7 @@ let monstersList = {
       "attack":3,
       "minLevel": 4,
       "color":"green",
-      "code":"//make player hallucinate"
+      "code":"hallucinate=true;console.log('The toad hit you. You are hallucinating')"
     },
     {
       "name":"hell dog",
@@ -176,7 +177,7 @@ let monstersList = {
       "attack":12,
       "minLevel": 9,
       "color":"blue",
-      "code":""
+      "code":"console.log('floating eyeball blinds you');turnOnDarkness();"
     },
     {
       "name":"centaur",
@@ -246,6 +247,7 @@ class Monster {
    this.attack	   = monstersList.monsters[_monster].attack;
    this.aggression = monstersList.monsters[_monster].aggression;
    this.color      = monstersList.monsters[_monster].color;
+   this.code       = monstersList.monsters[_monster].code;
 
 //choose x location
    if (pos !== null){
@@ -282,7 +284,7 @@ function start(){
   checkTerminal();
 
   console.log('Welcome to One Dim Dungeon 1dimensional roguelike');
-  console.log('Version 0.1.1');
+  console.log('Version 0.1.2');
   console.log();
   lastScore = fs.readFileSync('.lastscore.txt', 'utf8');
   highScore = fs.readFileSync('.highscore.txt', 'utf8');
@@ -377,6 +379,7 @@ function main(){
     }
 
     checkBlindness();
+    checkHallucinate();
 
     printStats();
     drawScreen();
@@ -587,14 +590,16 @@ function usePotion(){
       }
     } else if (result<0.3){ //BAD
       console.log('A cloak of darkness temporarily blinds you'); 
-      blind = true;
-      blindness = Math.ceil(Math.random()*6+2); //3 to 8 turns
+      turnOnDarkness();
     } else if (result<0.5){//increase health, no limit! 6 is a magic number
 	console.log('You drink a health potion'); //GOOD
 	hp+=Math.round(Math.random()*(playerLevel/2)+6); 
     } else if (result<0.6){
        console.log('You were poisoned!');
        hp-=Math.round(Math.random()*playerLevel);
+    } else if (result<0.7){
+      hallucinate=true;
+      console.log('You are hallucinating');
     } else if ((result<0.8)&&(playerLevel<16)){ //can't fall through final floor
       console.log('Dissolving dust. You fall through the floor. Ooof.'); //OK
        hp-=Math.round(playerLevel/3);
@@ -617,6 +622,18 @@ function checkBlindness(){
   }
   if (blindness<=0)(blind=false)
 }
+
+function turnOnDarkness(){
+  blind = true;
+  blindness = Math.ceil(Math.random()*6+2); //3 to 8 turns
+}
+
+function checkHallucinate(){
+  if (Math.random()<0.1){ //10% chance of it ending! 
+    hallucinate = false;
+  }
+}
+
 
 function spawnMonster(pos){
   let allowSpawn = true;
@@ -660,6 +677,11 @@ function moveMonsters(legitMove){
 	  } else if (monsters[monster].x == (playerX-1)){
 	    lastMonster=monsters[monster].name; //save monster's name for stats output
             console.log('The '+lastMonster+ ' hit you!');
+
+	    if (monsters[monster].code){ //check to see if there's any special code to run
+	      eval(monsters[monster].code);
+	    }
+
 	    //player loses some hp
 	    hp-=monsters[monster].attack;
 
@@ -680,6 +702,11 @@ function moveMonsters(legitMove){
             //console.log('The '+monsters[monster].name+ ' hit you!');
 	    lastMonster=monsters[monster].name;
             console.log('The '+lastMonster+ ' hit you!');
+
+	    if (monsters[monster].code){ //check to see if there's any special code to run
+	      eval(monsters[monster].code);
+	    }
+
 	    //player loses some hp
 	    hp-=monsters[monster].attack;
 	  }
@@ -721,6 +748,14 @@ function drawScreen(){
 	    monsterPresent = true;
             currentChar = monsters[monster].char;
 	    currentColor = monsters[monster].color;
+
+	      //if hallucinating
+	      if (hallucinate){
+		let randNum = Math.floor(Math.random()*57 + 65);
+		currentChar = String.fromCharCode(randNum);
+		currentColor = "white";
+	      }
+
 	   //DEBUG
 	      if (debugMode){
 		console.log(monsters[monster].char+' on index: '+index);
@@ -737,9 +772,11 @@ function drawScreen(){
       else if (goldX == index){
         currentChar = '*';
 	currentColor = "green";
+	hallucinateItem();
       } else if (potionX == index){
         currentChar = '!';
 	currentColor = "magenta";
+	hallucinateItem();
       } else if (stairsX == index){
 	  if (playerLevel>15){
 	    currentChar = '%'; //on last level
@@ -747,6 +784,7 @@ function drawScreen(){
 	    currentChar = '<';
 	  }
 	  currentColor = "blue";
+	  hallucinateItem();
       }  else {  //otherwise, nothing's there
         currentChar = '.';
 	currentColor = "white";
@@ -756,6 +794,7 @@ function drawScreen(){
 	currentChar = ' ';
 	currentColor = "white";
       } 
+
 
       printdungeon+=currentChar; //string of current dungeon
       dungeonColors.push(currentColor); //array of colors for current dungeon
@@ -780,7 +819,11 @@ function drawScreen(){
     }
     if (vertical){
       if (!blind){
-	console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
+	if (!hallucinate){
+	  console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
+	} else {
+	  console.log(chalk.yellow.bgMagenta.bold('#')+chalk.red.bgGreen.bold('~')+chalk.yellow.bgMagenta.bold('#'));
+	}
 	  for (let i = 0; i < dungeon.length-2; i++){
 
 	      let chalkColor = chalk.keyword(dungeonColors[i])
@@ -803,9 +846,19 @@ function drawScreen(){
 	      let chalkColor = chalk.keyword(dungeonColors[i])
 	      dungeonString+=chalkColor(Array.from(printdungeon)[i])
 	  }
+	if (!hallucinate){
 	  console.log(chalk.green.bgBlue.bold(castlewall));
+	} else {
+	  console.log(chalk.blue.bgRed.bold(castlewall));
+	}
 	  console.log(chalk.green.bgBlue.bold('[')+dungeonString+chalk.green.bgBlue.bold(']'));
+	if (!hallucinate){
 	  console.log(chalk.green.bgBlue.bold(castlewall));
+	} else {
+	  console.log(chalk.blue.bgRed.bold(castlewall));
+	}
+
+
 	}  else { //you're blind! antipattern!
 	   console.log();
 	   console.log(printdungeon);
@@ -813,6 +866,15 @@ function drawScreen(){
         }
 
       }
+}
+
+function hallucinateItem(){
+    //if hallucinating
+    if (hallucinate){
+      let randNum = Math.floor(Math.random()*12 + 35);
+      currentChar = String.fromCharCode(randNum);
+      currentColor = "red";
+    }
 }
 
 function printStats(){
