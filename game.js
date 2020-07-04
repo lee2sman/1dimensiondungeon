@@ -24,7 +24,7 @@ let monstersList = {
       "aggression": 0.55,
       "attack": 2,
       "minLevel": 0,
-      "color": "black",
+      "color": "white",
       "code": ""
     }, 
     {
@@ -34,7 +34,7 @@ let monstersList = {
       "aggression": 0.70,
       "attack": 2,
       "minLevel": 0,
-      "color": "black",
+      "color": "white",
       "code": ""
     }, 
     {
@@ -44,7 +44,7 @@ let monstersList = {
       "aggression":0.35,
       "attack":1,
       "minLevel": 0,
-      "color":"black",
+      "color":"white",
       "code":"//move somewhere else randomly in level"
     },
     {
@@ -64,7 +64,7 @@ let monstersList = {
       "aggression":0.25,
       "attack":2,
       "minLevel": 2,
-      "color":"black",
+      "color":"white",
       "code":""
     },
     {
@@ -74,7 +74,7 @@ let monstersList = {
       "aggression":0.75,
       "attack":3,
       "minLevel": 2,
-      "color":"black",
+      "color":"white",
       "code":""
     },
     {
@@ -94,7 +94,7 @@ let monstersList = {
       "aggression":0.72,
       "attack":4,
       "minLevel": 3,
-      "color":"black",
+      "color":"white",
       "code":""
     },
     {
@@ -134,7 +134,7 @@ let monstersList = {
       "aggression":0.72,
       "attack":3,
       "minLevel": 6,
-      "color":"black",
+      "color":"white",
       "code":""
     },
     {
@@ -155,7 +155,7 @@ let monstersList = {
       "aggression":0.5,
       "attack":5,
       "minLevel": 7,
-      "color":"white",
+      "color":"cyan",
       "code":""
     },
     {
@@ -245,6 +245,7 @@ class Monster {
    this.hp    	   = monstersList.monsters[_monster].hp;
    this.attack	   = monstersList.monsters[_monster].attack;
    this.aggression = monstersList.monsters[_monster].aggression;
+   this.color      = monstersList.monsters[_monster].color;
 
 //choose x location
    if (pos !== null){
@@ -706,17 +707,20 @@ function drawScreen(){
 
     //DRAW SCREEN
     let printdungeon = '';
+    let dungeonColors = [];
 
     for (let index = 1; index < dungeon.length - 1; index++){ //loop through all spaces except 0th and last (so player can't see ends)
 
       //BUILD UP THE DUNGEON STRING
       let currentChar = '';
+      let currentColor;
 
       let monsterPresent = false;
       for (monster in monsters){
          if (monsters[monster].x == index){
 	    monsterPresent = true;
             currentChar = monsters[monster].char;
+	    currentColor = monsters[monster].color;
 	   //DEBUG
 	      if (debugMode){
 		console.log(monsters[monster].char+' on index: '+index);
@@ -728,24 +732,33 @@ function drawScreen(){
 	//was set above
       } else if (playerX == index){
 	currentChar = '@';
+	currentColor = "blue";
 	} 
       else if (goldX == index){
         currentChar = '*';
+	currentColor = "green";
       } else if (potionX == index){
         currentChar = '!';
+	currentColor = "magenta";
       } else if (stairsX == index){
 	  if (playerLevel>15){
 	    currentChar = '%'; //on last level
 	  } else {
 	    currentChar = '<';
 	  }
+	  currentColor = "blue";
       }  else {  //otherwise, nothing's there
         currentChar = '.';
+	currentColor = "white";
       }
       
-      if (blind&&!(index==playerX)){currentChar = ' ';} 
+      if (blind&&!(index==playerX)){
+	currentChar = ' ';
+	currentColor = "white";
+      } 
 
-      printdungeon+=currentChar;
+      printdungeon+=currentChar; //string of current dungeon
+      dungeonColors.push(currentColor); //array of colors for current dungeon
     }
 
 //USEFUL IN DEBUGGING
@@ -769,7 +782,9 @@ function drawScreen(){
       if (!blind){
 	console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
 	  for (let i = 0; i < dungeon.length-2; i++){
-	   console.log(chalk.green.bgBlue.bold('#')+chalk.gray.bgMagenta(Array.from(printdungeon)[i])+chalk.green.bgBlue.bold('#'));
+
+	      let chalkColor = chalk.keyword(dungeonColors[i])
+	     console.log(chalk.green.bgBlue.bold('#')+chalkColor(Array.from(printdungeon)[i])+chalk.green.bgBlue.bold('#'));
 	  }
 	console.log(chalk.green.bgBlue.bold('#')+chalk.cyan.bgBlue.bold('~')+chalk.green.bgBlue.bold('#'));
       } else { //you're blind! antipattern!
@@ -781,8 +796,15 @@ function drawScreen(){
       }
     } else { //horizontal
         if (!blind){
+	  //
+	  let dungeonString = "";
+	  for (let i = 0; i < dungeon.length-2; i++){
+
+	      let chalkColor = chalk.keyword(dungeonColors[i])
+	      dungeonString+=chalkColor(Array.from(printdungeon)[i])
+	  }
 	  console.log(chalk.green.bgBlue.bold(castlewall));
-	  console.log(chalk.cyan.bgBlue.bold('[')+chalk.gray.bgMagenta(printdungeon)+chalk.green.bgBlue.bold(']'));
+	  console.log(chalk.green.bgBlue.bold('[')+dungeonString+chalk.green.bgBlue.bold(']'));
 	  console.log(chalk.green.bgBlue.bold(castlewall));
 	}  else { //you're blind! antipattern!
 	   console.log();

@@ -8,9 +8,9 @@
   - [X] spawn a random enemy
   - [X] agitate monsters (increase their aggression)
   - [X] dissolving spell. fall through floor
-- [ ] implement monster dictionary (json) so they have preset character differences
-  - [ ] monsters have specified attack ```xp``` and ```hp``` set at spawn rather than randomly rolled each time it hits. This will allow that 'oh no!' feeling to occur when the player sees a particularly nasty enemy rather than have fighting outcome feel more randomized
-  - [ ] monsters have specific colors
+- [o] implement monster dictionary (json) so they have preset character differences
+  - [X] monsters have specified attack ```xp``` and ```hp``` set at spawn rather than randomly rolled each time it hits. This will allow that 'oh no!' feeling to occur when the player sees a particularly nasty enemy rather than have fighting outcome feel more randomized
+  - [X] monsters have specific colors
   - [ ] monsters could have an added script with special ability that is run each time they move (and if adjacent to player)
 
 ## Added
