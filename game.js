@@ -767,7 +767,7 @@ function drawScreen(){
 	//was set above
       } else if (playerX == index){
 	currentChar = '@';
-	currentColor = "blue";
+	currentColor = "yellow";
 	} 
       else if (goldX == index){
         currentChar = '*';
@@ -783,7 +783,7 @@ function drawScreen(){
 	  } else {
 	    currentChar = '<';
 	  }
-	  currentColor = "blue";
+	  currentColor = "yellow";
 	  hallucinateItem();
       }  else {  //otherwise, nothing's there
         currentChar = '.';
@@ -849,13 +849,13 @@ function drawScreen(){
 	if (!hallucinate){
 	  console.log(chalk.green.bgBlue.bold(castlewall));
 	} else {
-	  console.log(chalk.blue.bgRed.bold(castlewall));
+	  console.log(chalk.yellow.bgRed.bold(castlewall));
 	}
 	  console.log(chalk.green.bgBlue.bold('[')+dungeonString+chalk.green.bgBlue.bold(']'));
 	if (!hallucinate){
 	  console.log(chalk.green.bgBlue.bold(castlewall));
 	} else {
-	  console.log(chalk.blue.bgRed.bold(castlewall));
+	  console.log(chalk.yellow.bgRed.bold(castlewall));
 	}
 
 
