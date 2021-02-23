@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 //One dim dungeon 
 //by lee2sman 2020
 //welcome to my spaghetti code
