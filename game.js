@@ -944,7 +944,7 @@ function end(){
 function printOutAndQuit(){
       console.log('You killed '+killed+' monsters and found '+gold+' gold.');
   //write to file
-  let score = gold;
+  let score = gold.toString();
   fs.writeFileSync('.lastscore.txt', score, (err) => {
     // throws an error, you could also catch it here
     if (err) throw err;
