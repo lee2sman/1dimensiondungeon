@@ -1,0 +1,8 @@
+# Conduct
+
+- [X] Tripper - Hallucinated at least 4 times
+- [X] Hoarder - Died with at least 4 potions
+- [X] Pacifist - Killed no monsters
+- [X] Pauper - Died with no gold
+- [X] LichLicker - Killed at least 3 Arch Lich
+- [X] Drinker - Quaffed at least 6 potions
