@@ -23,6 +23,7 @@
 - [X] varied enemy behaviors including attacks, 'hallucination' (like toads in Brogue) - would need clock feature, generating minions, freezing, etc
   - [X] simple clock timeout feature
 - [X] choose different font, use color (background and on font)
+- [X] Add conduct
 
 ## Under consideration
 - [ ] game also output graphically - tiles and/or also runs on web
