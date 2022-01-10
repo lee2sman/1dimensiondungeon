@@ -10,9 +10,10 @@ const fs = require('fs');
 const chalk = require('chalk');
 
 let lastScore, highScore;
-let hp=6, playerLevel = 0, gold=0, potions = 0, scrolls = 0, floor = 0, debugMode = false, vertical = false, flipflop = false, blind = false, blindness = 5, hallucinate = false;
+let hp=6, playerLevel = 0, gold=0, potions = 0, floor = 0, debugMode = false, vertical = false, flipflop = false, blind = false, blindness = 5, hallucinate = false, tripCounter = 0, archCounter = 0, potionsUsed = 0;
 let playerX = 0;
 let stairsX, goldX = 0, potionX = 0;
+let conduct = "Adventurer";
 let killed = 0;
 let lastMonster = '';
 let monsters = [], dungeonStartLength=24;
@@ -107,7 +108,7 @@ let monstersList = {
       "attack":3,
       "minLevel": 4,
       "color":"green",
-      "code":"hallucinate=true;console.log('The toad hit you. You are hallucinating')"
+      "code":"hallucinate=true;console.log('The toad hit you. You are hallucinating');tripCounter++"
     },
     {
       "name":"hell dog",
@@ -582,6 +583,7 @@ function usePotion(){
   if (potions>0){
     potionX = 0;
     potions--;
+    potionsUsed++;
 
     let result = Math.random();
     if (result<0.2){
@@ -601,6 +603,7 @@ function usePotion(){
     } else if (result<0.7){
       hallucinate=true;
       console.log('You are hallucinating');
+      tripCounter++;
     } else if ((result<0.8)&&(playerLevel<16)){ //can't fall through final floor
       console.log('Dissolving dust. You fall through the floor. Ooof.'); //OK
        hp-=Math.round(playerLevel/3);
@@ -724,6 +727,11 @@ function hitMonster(monsters,monster){
 
 	      killed++;
 	      console.log('You killed the '+monsters[monster].name+'!');
+
+               if (monsters[monster].name = "arch lich"){
+                   archCounter++;
+	       }
+
 	      //remove monster
               monsters.splice(monster, 1);
 	    }
@@ -914,6 +922,24 @@ function checkIfWon(){
   }
 }
 
+function checkConduct(){
+   if (killed==0){
+     conduct="Pacifist";
+   } else if (potions>3){
+     conduct="Hoarder";
+   } else if (gold<1){
+     conduct="Pauper";
+   } else if (tripCounter>3){
+     conduct="Tripper";
+   } else if (archCounter>3){
+     conduct="ArchLicker";
+   } else if (potionsUsed > 5){
+     conduct="Drinker";
+   } else {
+     conduct="Adventurer";
+   }
+}
+
 function end(){
 
     //clear screen
@@ -938,11 +964,13 @@ function end(){
                              -  \\)`);
       console.log('You died!');
       console.log('You were killed by a '+lastMonster+' on level '+playerLevel);
+      checkConduct();
       printOutAndQuit();
 }
 
 function printOutAndQuit(){
       console.log('You killed '+killed+' monsters and found '+gold+' gold.');
+      console.log('Conduct: '+conduct);
   //write to file
   let score = gold.toString();
   fs.writeFileSync('.lastscore.txt', score, (err) => {
