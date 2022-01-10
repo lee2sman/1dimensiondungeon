@@ -1,6 +1,6 @@
 # One Dimension Dungeon
 
-by lee2sman 2020
+by lee2sman 2020 - 2021
 
 ![1 dim dungeon](gameplay.gif)  
 
