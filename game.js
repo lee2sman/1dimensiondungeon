@@ -927,7 +927,7 @@ function checkConduct(){
      conduct="Pacifist";
    } else if (potions>3){
      conduct="Hoarder";
-   } else if (gold<1){
+   } else if (gold<1 && playerLevel>9){
      conduct="Pauper";
    } else if (tripCounter>3){
      conduct="Tripper";
