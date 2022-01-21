@@ -932,7 +932,7 @@ function checkConduct(){
    } else if (tripCounter>3){
      conduct="Tripper";
    } else if (archCounter>3){
-     conduct="ArchLicker";
+     conduct="LichLicker";
    } else if (potionsUsed > 5){
      conduct="Drinker";
    } else {
