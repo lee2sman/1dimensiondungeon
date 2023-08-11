@@ -414,8 +414,10 @@ function checkKeys(str, key){
     } else if (((!vertical && key.name === 'right') || (!vertical && key.name === 'l') || (vertical && key.name === 'down') || (vertical && key.name === 'j')) && playerX < dungeon.length-2){
       legitMove = true;
       moveRight();
-   } else if ((key.sequence === '.') || (key.name === 'space')){ //rest
-          legitMove = true;
+      //I have disabled resting, to make the game harder. But I've preserved the code here
+    //else if ((key.sequence === '.') || (key.name === 'space')){ //rest
+    //    legitMove = true;
+    //} 
     } else if ((key.name === 'q' && potions>0) || (key.name === 'p' && potions>0)){
            usePotion();
     } else if (key.sequence === 'Q'){ //quit, case-sensitive
@@ -539,7 +541,6 @@ function descendStairs(){
 
 function help(str, key){
       console.log('Motion:    ARROW KEYS or Vim-keys');
-      console.log('           space or . to rest one turn');
       console.log();
       console.log('Commands:');
       console.log();

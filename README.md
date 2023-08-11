@@ -35,7 +35,6 @@ To launch game in flip-flop mode (orientation switches every level):
 
 ```
 Motion:    ARROW KEYS or Vim-keys
-           space or . to rest one turn
 
 Commands:
 
