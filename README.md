@@ -1,8 +1,10 @@
-# One Dimension Dungeon
+# One Dim Dungeon ("Odd")
 
 by lee2sman 2020 - 2021
 
-![1 dim dungeon](gameplay.gif)  
+![One dim dungeon](gameplay.gif)  
+
+Odd is an "espresso-break" one-dimensional roguelike dungeon crawler, inspired by Rogue, Brough-likes, and the world of one-dimensional dungeon crawlers.
 
 ### Dependencies
 
@@ -16,20 +18,20 @@ Download (or clone) and run ```npm install``` to install chalk via npm
 ## To launch
 
 ```
-node game.js
+./odd
 ```
 
 To launch with debug mode on:
 
-```node game.js --debug``` OR ```node game.js -d```
+```./odd --debug``` OR ```./odd -d```
 
 To launch with vertical orientation:
 
-```node game.js --vertical``` OR ```node game.js -v```
+```./odd --vertical``` OR ```./odd -v```
 
 To launch game in flip-flop mode (orientation switches every level):
 
-```node game.js --flip-flop``` OR ```node game.js -f```
+```./odd --flip-flop``` OR ```./odd -f```
 
 ## Controls
 
@@ -76,7 +78,7 @@ You can now also change the orientation!
 
 ## Bugs
 
-Have ideas or thoughts on bugs or portability or mechanics? File an issue or get in touch on [twitter](https://twitter.com/2sman2sman). 
+Have ideas or thoughts on bugs or portability or mechanics? File an issue, or get in touch via [my website](https://leetusman.com).
 
 ## Roadmap
 

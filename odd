@@ -397,7 +397,7 @@ function checkTerminal(){
   if (process.stdout.columns<48 || process.stdout.rows<22){
     console.log();
     console.log('WARNING:');
-    console.log('1dim dungeon recommends a min width of 48 and height of 22.');
+    console.log('One Dim Dungeon recommends a min width of 48 and height of 22.');
     console.log();
   }
 }
@@ -421,6 +421,7 @@ function checkKeys(str, key){
     } else if ((key.name === 'q' && potions>0) || (key.name === 'p' && potions>0)){
            usePotion();
     } else if (key.sequence === 'Q'){ //quit, case-sensitive
+      lastMonster = "self-destruction";
       end();
     } else if (key.name === 'r'){
           legitMove = true;
@@ -964,7 +965,7 @@ function end(){
    \\))ejm97/.,(//,,..,,\\||(,wo,\\ ).((//
                              -  \\)`);
       console.log('You died!');
-      console.log('You were killed by a '+lastMonster+' on level '+playerLevel);
+      console.log('You were killed by a '+lastMonster+' on level '+playerLevel+'.');
       checkConduct();
       printOutAndQuit();
 }
