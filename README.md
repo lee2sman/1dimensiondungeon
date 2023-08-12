@@ -1,6 +1,6 @@
 # One Dim Dungeon ("Odd")
 
-by lee2sman 2020 - 2021
+by lee2sman 2020 - 2023
 
 ![One dim dungeon](gameplay.gif)  
 
